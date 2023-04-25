@@ -2,6 +2,12 @@
 
 Real-time transcription using faster-whisper
 
+## Installation
+
+1. pip install faster-whisper
+2. pip install webrtcvad
+3. pip install pyaudio
+
 ## Usage
 
 1. python main.py(\*1)

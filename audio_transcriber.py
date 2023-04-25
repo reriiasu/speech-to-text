@@ -29,9 +29,7 @@ class AudioTranscriber:
                 )
 
                 for segment in segments:
-                    print(
-                        f"[{segment.start:.2f}s -> {segment.end:.2f}s] {segment.text}"
-                    )
+                    print(segment.text)
 
     def process_audio(self, in_data, frame_count, time_info, status):
         is_speech = self.vad_wrapper.is_speech(in_data)
@@ -47,11 +45,13 @@ class AudioTranscriber:
             not is_speech
             and self.silent_chunks > self.vad_wrapper.SILENT_CHUNKS_THRESHOLD
         ):
-
-            if len(self.speech_buffer) > 0:
+            if len(self.speech_buffer) > 20:
                 audio_data_np = np.concatenate(self.speech_buffer)
                 self.speech_buffer.clear()
                 self.audio_queue.put(audio_data_np)
+            else:
+                # noise clear
+                self.speech_buffer.clear()
 
         return (in_data, pyaudio.paContinue)
 
