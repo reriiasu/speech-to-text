@@ -17,6 +17,7 @@ def get_valid_input_devices():
         ):
             valid_devices.append(device_info)
 
+    audio.terminate()
     return valid_devices
 
 
