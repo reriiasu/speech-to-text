@@ -2,6 +2,8 @@
 
 Real-time transcription using faster-whisper
 
+![use animation](UseAnimation.gif)
+
 ## Installation
 
 1. pip install -r requirements.txt
