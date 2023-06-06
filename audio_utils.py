@@ -1,50 +1,32 @@
-import pyaudio
+import sounddevice as sd
 
-
-# 有効なインプットデバイスリストを取得する関数
+# get a list of valid input devices
 def get_valid_input_devices():
     valid_devices = []
-    audio = pyaudio.PyAudio()
-    device_count = audio.get_device_count()
-    default_host_api_info = audio.get_default_host_api_info()
-    default_host_api_index = default_host_api_info["index"]
+    devices = sd.query_devices()
+    hostapis = sd.query_hostapis()
 
-    for i in range(device_count):
-        device_info = audio.get_device_info_by_index(i)
-        if (
-            device_info["maxInputChannels"] > 0
-            and device_info["hostApi"] == default_host_api_index
-        ):
-            valid_devices.append(device_info)
-
-    audio.terminate()
+    for device in devices:
+        if device['max_input_channels'] > 0:
+            device['host_api_name'] = hostapis[device['hostapi']]['name']
+            valid_devices.append(device)
     return valid_devices
 
 
-# 有効なインプットデバイスリストを表示する関数
-def display_valid_input_devices(valid_devices):
-    for device_info in valid_devices:
-        print(
-            f"DeviceIndex: {device_info['index']}, DeviceName: {device_info['name']}, 入力チャンネル数: {device_info['maxInputChannels']}"
-        )
-
-
-# オーディオストリームを作成する関数
-def create_audio_stream(selected_device_index, callback):
+# create an audio stream
+def create_audio_stream(selected_device, callback):
     RATE = 16000
     CHUNK = 480
-    FORMAT = pyaudio.paInt16
     CHANNELS = 1
+    DTYPE = "int16"
 
-    audio = pyaudio.PyAudio()
-    stream = audio.open(
-        format=FORMAT,
+    stream = sd.InputStream(
+        device=selected_device,
         channels=CHANNELS,
-        rate=RATE,
-        input=True,
-        input_device_index=selected_device_index,
-        frames_per_buffer=CHUNK,
-        stream_callback=callback,
+        samplerate=RATE,
+        callback=callback,
+        dtype=DTYPE,
+        blocksize=CHUNK
     )
 
     return stream

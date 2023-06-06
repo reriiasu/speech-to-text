@@ -1,0 +1,256 @@
+body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+  background-color: #f4f4f4;
+}
+
+.menus {
+  display: flex;
+  justify-content: flex-end;
+  list-style: none;
+  margin: 0;
+  padding: 20px 0;
+  background-color: #333;
+}
+
+.menu {
+  color: #fff;
+  cursor: pointer;
+  padding: 10px 10px;
+  border-radius: 5px;
+  transition: background-color 0.3s ease;
+  width: 160px;
+  text-align: center;
+  margin-right: 10px;
+}
+
+.menu:hover {
+  background-color: #555;
+}
+
+.menu.active {
+  background-color: #888; 
+  color: #000;
+}
+
+.setting-item {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.setting-item.audio-device {
+  display: block;
+}
+
+.setting-label {
+  width: 250px;
+  text-align: right;
+  margin-right: 10px;
+}
+
+.setting-control.number {
+  width: 40px;
+}
+
+.content-window {
+  position: absolute;
+  top: 78px;
+  right: 20px;
+  transition: max-height 0.5s ease;
+  z-index: 1;
+}
+
+.close-icon {
+  position: absolute;
+  top: 20px;
+  right: 25px;
+  width: 32px;
+  height: 32px;
+  cursor: pointer;
+  color: #333;
+}
+
+.content-inner {
+  overflow: auto;
+  max-height: 0;
+  max-width: 500px;
+  margin: 20px 20px;
+  padding: 20px;
+  border-radius: 5px;
+  background-color: #fff;
+  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
+.content-inner.main {
+  max-width: 928px;
+}
+
+.content-inner.open {
+  background-color: rgba(255, 255, 255, 0.6);
+  max-height: 1000px;
+  transition: max-height 0.8s ease-out;
+}
+
+.content-inner .note{
+  font-size: 0.9em;
+  color: #555"
+}
+
+#audio-device-select {
+  width: 800px
+}
+
+.transcription-button {
+  color: white;
+  padding: 15px 32px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  margin: 4px 2px;
+  cursor: pointer;
+  transition-duration: 0.4s;
+}
+
+.transcription-button.start-button {
+  background-color: #4CAF50;
+  border: 2px solid #4CAF50;
+}
+
+.transcription-button.start-button:hover {
+  background-color: white;
+  color: #4CAF50;
+}
+
+.transcription-button.stop-button {
+  background-color: #f44336;
+  border: 2px solid #f44336;
+}
+
+.transcription-button.stop-button:hover {
+  background-color: white;
+  color: #f44336;
+}
+
+.transcription-button:disabled {
+  background-color: #ccc;
+  color: #888;
+  cursor: not-allowed;
+  border: 2px solid #ccc;
+}
+
+.transcription-button:disabled:hover {
+  background-color: #ccc;
+  color: #888;
+  cursor: not-allowed;
+  border: 2px solid #ccc;
+}
+
+.message-area {
+  padding: 10px;
+  margin: 10px;
+  background: #f8f8f8;
+  border-radius: 10px;
+  border: 1px solid #ddd;
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 12px;
+  line-height: 1.4;
+  overflow: auto;
+  min-height: 60px;
+  max-height: 120px;
+  white-space: pre-wrap;
+  scrollbar-width: thin;
+  scrollbar-color: #888 #f1f1f1;
+}
+
+#transcription.message-area {
+  max-height: 450px;
+  height: 450px;
+}
+
+details {
+  position: relative;
+}
+
+.control-button {
+  position: absolute;
+  top: 0px;
+  padding: 5px 10px;
+  font-size: 12px;
+  color: #fff;
+  background-color: rgba(0, 0, 0, 0.7);
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  opacity: 0.4;
+  transition: opacity 0.3s;
+}
+
+.copy-button {
+  background-color: #008CBA;
+  right: 85px;
+}
+
+.clear-button {
+  background-color: #f44336;
+  right: 25px;
+}
+
+.control-button:hover {
+  opacity: 1;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #888;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+.toast {
+  visibility: hidden;
+  min-width: 250px;
+  color: #fff;
+  text-align: center;
+  border-radius: 15px;
+  padding: 10px;
+  position: fixed;
+  z-index: 1;
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: 30px;
+  font-size: 17px;
+  background-color: rgba(0, 0, 0, 0.7);
+  opacity: 0;
+  box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.3);
+}
+
+.toast.show {
+  visibility: visible;
+  animation: fadeout 3s;
+  animation-fill-mode: forwards;
+}
+
+@keyframes fadeout {
+  0% {
+    opacity: 1;
+  }
+  66.66% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}

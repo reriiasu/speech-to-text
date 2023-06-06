@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Speech to text</title>
+  <link rel="stylesheet" type="text/css" href="styles.css" />
+  <script type="text/javascript" src="eel.js"></script>
+  <script type="text/javascript" src="scripts.js"></script>
+</head>
+
+<body>
+  <div class="menus">
+    <div class="menu" id="model-settings">Model Settings</div>
+    <div class="menu" id="transcribe-settings">Transcribe Settings</div>
+  </div>
+  <div class="content" id="main-content">
+    <div class="content-inner main open">
+      <div class="setting-item audio-device">
+        <label for="audio-device-select" class="setting-label" title="Please select the target audio device.">Audio
+          Device:</label>
+        <select id="audio-device-select" class="setting-control"></select>
+      </div>
+      <button id="start-button" class="transcription-button start-button" onclick="startTranscription()">
+        Start Transcription
+      </button>
+      <button id="stop-button" class="transcription-button stop-button" onclick="stopTranscription()" disabled>
+        Stop Transcription
+      </button>
+      <details open>
+        <summary>console message</summary>
+        <button class="control-button copy-button" onclick="copyToClipboard('console-message')">
+          Copy
+        </button>
+        <button class="control-button clear-button" onclick="clearMessage('console-message')">
+          Clear
+        </button>
+        <pre id="console-message" class="message-area"></pre>
+      </details>
+      <details open>
+        <summary>transcription result</summary>
+        <button class="control-button copy-button" onclick="copyToClipboard('transcription')">
+          Copy
+        </button>
+        <button class="control-button clear-button" onclick="clearMessage('transcription')">
+          Clear
+        </button>
+        <pre id="transcription" class="message-area"></pre>
+      </details>
+      <div class="content-window" id="model-settings-content" hidden>
+        <svg id="close-icon" class="close-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+          stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+        <div class="content-inner">
+          <p class="note">
+            <em>Note: Hover over the labels for more information.</em><br>
+            <em>* is Mandatory field.</em>
+          </p>
+          <div class="setting-item">
+            <label for="model_size_or_path" class="setting-label"
+              title="Size of the model to use (tiny, tiny.en, base, base.en, small, small.en, medium, medium.en, large-v1, or large-v2) or a path to a converted model directory. When a size is configured, the converted model is downloaded from the Hugging Face Hub.">*Model
+              Size or Path:</label>
+            <select id="model_size_or_path" class="setting-control">
+              <!-- These options should be filled dynamically using JavaScript -->
+            </select>
+          </div>
+          <div class="setting-item">
+            <label for="device" class="setting-label"
+              title="Device to use for computation (cpu, cuda, auto).">*Device:</label>
+            <select id="device" class="setting-control">
+              <option value="auto">auto</option>
+              <option value="cpu">cpu</option>
+              <option value="cuda" selected>cuda</option>
+            </select>
+          </div>
+          <div class="setting-item">
+            <label for="device_index" class="setting-label"
+              title="Device ID to use. The model can also be loaded on multiple GPUs by passing a list of IDs (e.g. [0, 1, 2, 3]). In that case, multiple transcriptions can run in parallel when transcribe() is called from multiple Python threads (see also num_workers).">*Device
+              Index:</label>
+            <input id="device_index" class="setting-control" type="text" value="0" />
+          </div>
+          <div class="setting-item">
+            <label for="compute_type" class="setting-label"
+              title="Type to use for computation. See https://opennmt.net/CTranslate2/quantization.html.">*Compute
+              Type:</label>
+            <select id="compute_type" class="setting-control">
+              <option value="float16">float16</option>
+              <option value="int16">int16</option>
+              <option value="int8">int8</option>
+              <option value="int8_float16">int8_float16</option>
+            </select>
+          </div>
+          <div class="setting-item">
+            <label for="cpu_threads" class="setting-label"
+              title="Number of threads to use when running on CPU (4 by default). A non-zero value overrides the OMP_NUM_THREADS environment variable.">*CPU
+              Threads:</label>
+            <input id="cpu_threads" class="setting-control number" type="number" min="0" value="4" />
+          </div>
+          <div class="setting-item">
+            <label for="num_workers" class="setting-label"
+              title="When transcribe() is called from multiple Python threads, having multiple workers enables true parallelism when running the model (concurrent calls to self.model.generate() will run in parallel). This can improve the global throughput at the cost of increased memory usage.">*Number
+              of Workers:</label>
+            <input id="num_workers" class="setting-control number" type="number" min="0" value="1" />
+          </div>
+          <div class="setting-item">
+            <label for="download_root" class="setting-label"
+              title="Directory where the models should be saved. If not set, the models are saved in the standard Hugging Face cache directory.">Download
+              Root:</label>
+            <input type="text" id="download_root" class="setting-control optional" />
+          </div>
+
+          <div class="setting-item">
+            <label for="local_files_only" class="setting-label"
+              title="If checked, avoid downloading the file and return the path to the local cached file if it exists.">*Local
+              Files Only:</label>
+            <input type="checkbox" id="local_files_only" class="setting-control" />
+          </div>
+        </div>
+      </div>
+
+      <div class="content-window" id="transcribe-settings-content" hidden>
+        <svg id="close-icon" class="close-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+          stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+        <div class="content-inner">
+          <p class="note">
+            <em>Note: Hover over the labels for more information.</em><br>
+            <em>* is Mandatory field.</em>
+          </p>
+          <!-- audio file not supported -->
+          <!-- <div class="setting-item">
+            <label for="audio" class="setting-label"
+              title="Path to the input file (or a file-like object), or the audio waveform.">
+              *Audio:
+            </label>
+            <input id="audio" class="setting-control" />
+          </div> -->
+          <div class="setting-item">
+            <label for="language" class="setting-label"
+              title="The language spoken in the audio. It should be a language code such as 'en' or 'fr'. If not set, the language will be detected in the first 30 seconds of audio.">
+              Language:
+            </label>
+            <select id="language" class="setting-control optional">
+              <!-- options populated dynamically -->
+            </select>
+          </div>
+          <div class="setting-item">
+            <label for="task" class="setting-label" title="Task to execute (transcribe or translate).">
+              *Task:
+            </label>
+            <select id="task" class="setting-control">
+              <option value="transcribe" selected>transcribe</option>
+              <option value="translate">translate</option>
+            </select>
+          </div>
+          <div class="setting-item">
+            <label for="beam_size" class="setting-label" title="Beam size to use for decoding.">
+              *Beam Size:
+            </label>
+            <input id="beam_size" class="setting-control number" type="number" min="0" value="5" />
+          </div>
+          <div class="setting-item">
+            <label for="best_of" class="setting-label"
+              title="Number of candidates when sampling with non-zero temperature.">
+              *Best Of:
+            </label>
+            <input id="best_of" class="setting-control number" type="number" min="0" value="5" />
+          </div>
+          <div class="setting-item">
+            <label for="patience" class="setting-label" title="Beam search patience factor.">
+              *Patience:
+            </label>
+            <input id="patience" class="setting-control number" type="number" min="0" step="0.1" value="1" />
+          </div>
+          <div class="setting-item">
+            <label for="length_penalty" class="setting-label" title="Exponential length penalty constant.">
+              *Length Penalty:
+            </label>
+            <input id="length_penalty" class="setting-control number" type="number" min="0" step="0.1" value="1" />
+          </div>
+          <div class="setting-item">
+            <label for="temperature" class="setting-label"
+              title="Temperature for sampling. It can be a tuple of temperatures, which will be successively used upon failures according to either `compression_ratio_threshold` or `log_prob_threshold`.">
+              *Temperature:
+            </label>
+            <input id="temperature" class="setting-control" type="text" value="0.0,0.2,0.4,0.6,0.8,1.0" />
+          </div>
+          <div class="setting-item">
+            <label for="compression_ratio_threshold" class="setting-label"
+              title="If the gzip compression ratio is above this value, treat as failed.">
+              Compression Ratio Threshold:
+            </label>
+            <input id="compression_ratio_threshold" class="setting-control number optional" type="number" min="0"
+              step="0.1" value="2.4" />
+          </div>
+          <div class="setting-item">
+            <label for="log_prob_threshold" class="setting-label"
+              title="If the average log probability over sampled tokens is below this value, treat as failed.">
+              Log Probability Threshold:
+            </label>
+            <input id="log_prob_threshold" class="setting-control number optional" type="number" min="-9" step="0.1"
+              value="-1.0" />
+          </div>
+          <div class="setting-item">
+            <label for="no_speech_threshold" class="setting-label"
+              title="If the no_speech probability is higher than this value AND the average log probability over sampled tokens is below `log_prob_threshold`, consider the segment as silent.">
+              No Speech Threshold:
+            </label>
+            <input id="no_speech_threshold" class="setting-control number optional" type="number" min="0" step="0.1"
+              value="0.6" />
+          </div>
+          <div class="setting-item">
+            <label for="condition_on_previous_text" class="setting-label"
+              title="If True, the previous output of the model is provided as a prompt for the next window; disabling may make the text inconsistent across windows, but the model becomes less prone to getting stuck in a failure loop, such as repetition looping or timestamps going out of sync.">
+              *Condition On Previous Text:
+            </label>
+            <input id="condition_on_previous_text" class="setting-control" type="checkbox" checked />
+          </div>
+          <div class="setting-item">
+            <label for="initial_prompt" class="setting-label"
+              title="Optional text to provide as a prompt for the first window.">
+              Initial Prompt:
+            </label>
+            <input id="initial_prompt" class="setting-control optional" />
+          </div>
+          <div class="setting-item">
+            <label for="prefix" class="setting-label"
+              title="Optional text to provide as a prefix for the first window.">
+              Prefix:
+            </label>
+            <input id="prefix" class="setting-control optional" />
+          </div>
+          <div class="setting-item">
+            <label for="suppress_blank" class="setting-label"
+              title="Suppress blank outputs at the beginning of the sampling.">
+              *Suppress Blank:
+            </label>
+            <input id="suppress_blank" class="setting-control" type="checkbox" checked />
+          </div>
+          <div class="setting-item">
+            <label for="suppress_tokens" class="setting-label"
+              title="List of token IDs to suppress. -1 will suppress a default set of symbols as defined in the model config.json file.">
+              Suppress Tokens:
+            </label>
+            <input id="suppress_tokens" class="setting-control optional" type="text" value="-1" />
+          </div>
+          <div class="setting-item">
+            <label for="without_timestamps" class="setting-label" title="Only sample text tokens.">
+              *Without Timestamps:
+            </label>
+            <input id="without_timestamps" class="setting-control" type="checkbox" />
+          </div>
+          <div class="setting-item">
+            <label for="max_initial_timestamp" class="setting-label"
+              title="The initial timestamp cannot be later than this.">
+              *Max Initial Timestamp:
+            </label>
+            <input id="max_initial_timestamp" class="setting-control number" type="number" min="0" step="0.1"
+              value="1.0" />
+          </div>
+          <div class="setting-item">
+            <label for="word_timestamps" class="setting-label"
+              title="Extract word-level timestamps using the cross-attention pattern and dynamic time warping, and include the timestamps for each word in each segment.">
+              *Word Timestamps:
+            </label>
+            <input id="word_timestamps" class="setting-control" type="checkbox" />
+          </div>
+          <div class="setting-item">
+            <label for="prepend_punctuations" class="setting-label"
+              title="If word_timestamps is True, merge these punctuation symbols with the next word">
+              *Prepend Punctuations:
+            </label>
+            <input id="prepend_punctuations" class="setting-control" value="\&quot;'“¿([{-" />
+          </div>
+          <div class="setting-item">
+            <label for="append_punctuations" class="setting-label"
+              title="If word_timestamps is True, merge these punctuation symbols with the previous word">
+              *Append Punctuations:
+            </label>
+            <input id="append_punctuations" class="setting-control" value="\&quot;'.。,，!！?？:：”)]}、" />
+          </div>
+          <div class="setting-item">
+            <label for="vad_filter" class="setting-label"
+              title="Enable the voice activity detection (VAD) to filter out parts of the audio without speech. This step is using the Silero VAD model https://github.com/snakers4/silero-vad.">
+              *VAD Filter:
+            </label>
+            <input id="vad_filter" class="setting-control" type="checkbox" />
+          </div>
+          <div class="setting-item">
+            <label for="vad_parameters" class="setting-label"
+              title="Dictionary of Silero VAD parameters or VadOptions class (see available parameters and default values in the class VadOptions).">
+              VAD Parameters:
+            </label>
+            <input id="vad_parameters" class="setting-control optional" />
+          </div>
+        </div>
+      </div>
+      <div id="toast" class="toast">Copied to clipboard!</div>
+    </div>
+  </div>
+</body>
+
+</html>

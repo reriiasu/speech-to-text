@@ -1,0 +1,4 @@
+faster-whisper == 0.6.0
+webrtcvad == 2.0.10
+sounddevice == 0.4.6
+eel == 0.15.3

@@ -4,19 +4,24 @@ Real-time transcription using faster-whisper
 
 ## Installation
 
-1. pip install faster-whisper
-2. pip install webrtcvad
-3. pip install pyaudio
+1. pip install -r requirements.txt
 
 ## Usage
 
-1. python main.py(\*1)
-2. Select input device
-3. Voice input
+1. python main.py
+2. Select Input Audio Device
+3. Select "Model Settings" and configure the settings.
+4. Select "Transcribe Settings" and configure the settings.
+5. Start Transcription
 
-(\*1)There is a check and download for the latest models
+## Notes
 
-Change the following parameters as necessary.
+- If you select local_model in "Model size or path", the model with the same name in the local folder will be referenced.
+- I haven't validated the parameters because I don't know the proper value for 'Whisper' or 'faster-whisper'.
+  Check the error message displayed on the console.
 
-- vad_utils.py
-- whisper_utils.py
+## Todo
+
+1. Save and load previous settings.
+2. Try Silero VAD
+3. Allow local parameters to be set from the GUI.
