@@ -1,5 +1,6 @@
 import asyncio
 import eel
+import sys
 import threading
 import json
 
@@ -55,9 +56,23 @@ def get_filtered_transcribe_settings(settings):
     valid_keys = WhisperModel.transcribe.__annotations__.keys()
     return {k: v for k, v in settings.items() if k in valid_keys}
 
+def on_close(page, sockets):
+    stop_transcription()
+    print(page, 'was closed')
+
+    if transcriber.transcribing:
+        run_asyncio(transcriber.stop_transcription())
+
+    if t.is_alive():
+        loop.call_soon_threadsafe(loop.stop)
+        t.join()
+    sys.exit()
+
 if __name__ == "__main__":
     loop = asyncio.new_event_loop()
     transcriber = AudioTranscriber(loop)
     t = threading.Thread(target=loop.run_forever)
+    t.setDaemon(True)
     t.start()
-    eel.start('index.html', size=(1024, 1024)) 
+    eel.start('index.html', size=(1024, 1024), close_callback=on_close) 
+
