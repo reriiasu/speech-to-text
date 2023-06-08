@@ -1,16 +1,16 @@
 # speech-to-text
 
-Real-time transcription using faster-whisper
+Real-time transcription using [faster-whisper](https://github.com/guillaumekln/faster-whisper)
 
 ![use animation](docs/UseAnimation.gif)
 
 ## Installation
 
-1. pip install -r requirements.txt
+1. pip install .
 
 ## Usage
 
-1. python main.py
+1. python -m speech_to_text
 2. Select Input Audio Device
 3. Select "Model Settings" and configure the settings.
 4. Select "Transcribe Settings" and configure the settings.
