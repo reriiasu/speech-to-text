@@ -2,7 +2,7 @@
 
 Real-time transcription using faster-whisper
 
-![use animation](UseAnimation.gif)
+![use animation](docs/UseAnimation.gif)
 
 ## Installation
 
