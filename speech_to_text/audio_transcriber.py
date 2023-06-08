@@ -5,8 +5,8 @@ import queue
 import numpy as np
 
 from concurrent.futures import ThreadPoolExecutor
-from audio_utils import create_audio_stream
-from vad_utils import VadWrapper
+from .utils.audio_utils import create_audio_stream
+from .utils.vad_utils import VadWrapper
 
 class AudioTranscriber:
     def __init__(self, loop):

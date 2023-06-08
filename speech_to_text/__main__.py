@@ -2,11 +2,11 @@ import asyncio
 import eel
 import sys
 import threading
-import json
 
 from faster_whisper import WhisperModel
-from audio_transcriber import AudioTranscriber
-from audio_utils import get_valid_input_devices
+from .audio_transcriber import AudioTranscriber
+from .utils.audio_utils import get_valid_input_devices
+from .utils.file_utils import read_json
 
 eel.init('web')
 
@@ -17,15 +17,11 @@ def get_valid_devices():
 
 @eel.expose
 def get_model_sizes():
-    with open('json\model_sizes.json', 'r') as f:
-        model_sizes = json.load(f)['model_sizes']
-    return model_sizes
+    return read_json('model_sizes')
 
 @eel.expose
 def get_languages():
-    with open('json\languages.json', 'r') as f:
-        data = json.load(f)
-    return data['languages']
+    return read_json('languages')
 
 @eel.expose
 def start_transcription(selected_audio_device_index, model_settings, transcribe_settings):
@@ -72,7 +68,7 @@ if __name__ == "__main__":
     loop = asyncio.new_event_loop()
     transcriber = AudioTranscriber(loop)
     t = threading.Thread(target=loop.run_forever)
-    t.setDaemon(True)
+    t.daemon = True
     t.start()
     eel.start('index.html', size=(1024, 1024), close_callback=on_close) 
 
