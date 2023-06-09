@@ -27,16 +27,6 @@
         Stop Transcription
       </button>
       <div class="recive-message-area">
-        <label>console message</label>
-        <button class="control-button copy-button" onclick="copyToClipboard('console-message')">
-          Copy
-        </button>
-        <button class="control-button clear-button" onclick="clearMessage('console-message')">
-          Clear
-        </button>
-        <pre id="console-message" class="message-area"></pre>
-      </div>
-      <div class="recive-message-area">
         <label>transcription result</label>
         <button class="control-button copy-button" onclick="copyToClipboard('transcription')">
           Copy
@@ -45,6 +35,16 @@
           Clear
         </button>
         <pre id="transcription" class="message-area"></pre>
+      </div>
+      <div class="recive-message-area">
+        <label>console message</label>
+        <button class="control-button copy-button" onclick="copyToClipboard('console-message')">
+          Copy
+        </button>
+        <button class="control-button clear-button" onclick="clearMessage('console-message')">
+          Clear
+        </button>
+        <pre id="console-message" class="message-area"></pre>
       </div>
       <div class="content-window" id="model-settings-content" hidden>
         <svg id="close-icon" class="close-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
