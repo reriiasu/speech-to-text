@@ -159,16 +159,14 @@ body {
   font-size: 12px;
   line-height: 1.4;
   overflow: auto;
-  min-height: 60px;
-  max-height: 120px;
+  height: 120px;
   white-space: pre-wrap;
   scrollbar-width: thin;
   scrollbar-color: #888 #f1f1f1;
 }
 
 #transcription.message-area {
-  max-height: 450px;
-  height: 450px;
+  height: 495px;
 }
 
 .recive-message-area {
