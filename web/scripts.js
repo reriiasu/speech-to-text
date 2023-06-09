@@ -143,6 +143,20 @@ window.addEventListener("load", (event) => {
     }
   });
 
+  eel.get_compute_types()(function (compute_types) {
+    const select = document.getElementById("compute_type");
+    for (let i = 0; i < compute_types.length; i++) {
+      let opt = compute_types[i];
+      let el = document.createElement("option");
+      el.textContent = opt;
+      el.value = opt;
+      if (opt === "default") {
+        el.selected = true;
+      }
+      select.appendChild(el);
+    }
+  });
+
   eel.get_languages()(function (languages) {
     const select = document.getElementById("language");
     for (const key in languages) {

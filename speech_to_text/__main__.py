@@ -24,6 +24,10 @@ def get_model_sizes():
     return read_json('model_sizes')
 
 @eel.expose
+def get_compute_types():
+    return read_json('compute_types')
+
+@eel.expose
 def get_languages():
     return read_json('languages')
 
