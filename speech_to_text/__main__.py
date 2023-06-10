@@ -20,16 +20,16 @@ def get_valid_devices():
     return [{'index': d['index'], 'name':  f"{d['name']} {d['host_api_name']} ({d['max_input_channels']} in)" } for d in devices]
 
 @eel.expose
-def get_model_sizes():
-    return read_json('model_sizes')
+def get_dropdown_options():
+    data_types = ['model_sizes', 'compute_types', 'languages']
 
-@eel.expose
-def get_compute_types():
-    return read_json('compute_types')
+    dropdown_options = {}
+    for data_type in data_types:
+        data = read_json('assets', data_type)
+        dropdown_options[data_type] = data[data_type]
+    
+    return dropdown_options
 
-@eel.expose
-def get_languages():
-    return read_json('languages')
 
 @eel.expose
 def start_transcription(selected_audio_device_index, model_settings, transcribe_settings):
@@ -44,7 +44,7 @@ def start_transcription(selected_audio_device_index, model_settings, transcribe_
         transcriber = AudioTranscriber(event_loop, whisper_model, filtered_transcribe_settings, selected_audio_device_index)
         asyncio.set_event_loop(event_loop)
         thread = threading.Thread(target=event_loop.run_forever, daemon=True)
-        thread.start()        
+        thread.start()
     
         asyncio.run_coroutine_threadsafe(transcriber.start_transcription(), event_loop)
     except Exception as e:

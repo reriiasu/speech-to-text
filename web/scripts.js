@@ -127,47 +127,22 @@ async function stopTranscription() {
   await eel.stop_transcription();
 }
 
+function createDropdownOptions(data, dropdownId) {
+  const select = document.getElementById(dropdownId);
+  for (const key in data) {
+    const option = document.createElement("option");
+    option.value = key;
+    option.text = data[key];
+    select.appendChild(option);
+  }
+}
+
 window.addEventListener("load", (event) => {
   updateDevices();
-  eel.get_model_sizes()(function (model_sizes) {
-    let select = document.getElementById("model_size_or_path");
-    for (let i = 0; i < model_sizes.length; i++) {
-      let opt = model_sizes[i];
-      let el = document.createElement("option");
-      el.textContent = opt;
-      el.value = opt;
-      if (opt === "large-v2") {
-        el.selected = true;
-      }
-      select.appendChild(el);
-    }
-  });
-
-  eel.get_compute_types()(function (compute_types) {
-    const select = document.getElementById("compute_type");
-    for (let i = 0; i < compute_types.length; i++) {
-      let opt = compute_types[i];
-      let el = document.createElement("option");
-      el.textContent = opt;
-      el.value = opt;
-      if (opt === "default") {
-        el.selected = true;
-      }
-      select.appendChild(el);
-    }
-  });
-
-  eel.get_languages()(function (languages) {
-    const select = document.getElementById("language");
-    for (const key in languages) {
-      const option = document.createElement("option");
-      option.value = key;
-      option.text = languages[key];
-      if (key === "ja") {
-        option.selected = true;
-      }
-      select.appendChild(option);
-    }
+  eel.get_dropdown_options()(function (dropdownOptions) {
+    createDropdownOptions(dropdownOptions["model_sizes"], "model_size_or_path");
+    createDropdownOptions(dropdownOptions["compute_types"], "compute_type");
+    createDropdownOptions(dropdownOptions["languages"], "language");
   });
 
   const menus = document.querySelectorAll(".menu");
