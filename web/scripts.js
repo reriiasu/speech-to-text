@@ -110,30 +110,55 @@ function startTranscription() {
   document.getElementById("start-button").disabled = true;
   document.getElementById("stop-button").disabled = false;
 
-  const selectedAudioDeviceIndex = document.getElementById(
-    "audio-device-select"
-  ).selectedIndex;
+  const appSettings = {
+    "audio-device-select": document.getElementById("audio-device-select")
+      .selectedIndex,
+  };
   const modelSettings = getModelSettings();
   const transcribeSettings = getTranscribeSettings();
 
-  eel.start_transcription(
-    selectedAudioDeviceIndex,
-    modelSettings,
-    transcribeSettings
-  );
+  eel.start_transcription({
+    app_settings: appSettings,
+    model_settings: modelSettings,
+    transcribe_settings: transcribeSettings,
+  });
 }
 
 async function stopTranscription() {
   await eel.stop_transcription();
 }
 
-function createDropdownOptions(data, dropdownId) {
-  const select = document.getElementById(dropdownId);
-  for (const key in data) {
+function createDropdownOptions(options, elementId) {
+  const select = document.getElementById(elementId);
+  for (const key in options) {
     const option = document.createElement("option");
     option.value = key;
-    option.text = data[key];
+    option.text = options[key];
     select.appendChild(option);
+  }
+}
+
+function setContentSettings(settings, elementid) {
+  if (settings === undefined) {
+    return;
+  }
+
+  const elements = Array.from(
+    document.querySelector(elementid).querySelectorAll(".setting-control")
+  );
+
+  for (let element of elements) {
+    if (!(element.id in settings)) {
+      continue;
+    }
+
+    if (Array.isArray(settings[element.id])) {
+      element.value = settings[element.id].join(",");
+    } else if (element.tagName === "INPUT" && element.type === "checkbox") {
+      element.checked = settings[element.id];
+    } else {
+      element.value = settings[element.id];
+    }
   }
 }
 
@@ -143,6 +168,18 @@ window.addEventListener("load", (event) => {
     createDropdownOptions(dropdownOptions["model_sizes"], "model_size_or_path");
     createDropdownOptions(dropdownOptions["compute_types"], "compute_type");
     createDropdownOptions(dropdownOptions["languages"], "language");
+  });
+
+  eel.get_user_settings()(function (userSettings) {
+    setContentSettings(userSettings["app_settings"], "#main-content");
+    setContentSettings(
+      userSettings["model_settings"],
+      "#model-settings-content"
+    );
+    setContentSettings(
+      userSettings["transcribe_settings"],
+      "#transcribe-settings-content"
+    );
   });
 
   const menus = document.querySelectorAll(".menu");

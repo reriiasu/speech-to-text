@@ -6,7 +6,7 @@ import threading
 from faster_whisper import WhisperModel
 from .audio_transcriber import AudioTranscriber
 from .utils.audio_utils import get_valid_input_devices
-from .utils.file_utils import read_json
+from .utils.file_utils import read_json, write_json
 
 eel.init('web')
 
@@ -30,21 +30,41 @@ def get_dropdown_options():
     
     return dropdown_options
 
+@eel.expose
+def get_user_settings():
+    data_types = ['app_settings', 'model_settings', 'transcribe_settings']
+    userSettings = {}
+
+    try:
+        data = read_json('settings', 'user_settings')
+        for data_type in data_types:
+            userSettings[data_type] = data[data_type]
+    except Exception as e:
+        for arg in e.args:
+            eel.on_recive_message(arg)
+    
+    return userSettings
 
 @eel.expose
-def start_transcription(selected_audio_device_index, model_settings, transcribe_settings):
+def start_transcription(userSettings):
     global transcriber, event_loop, thread
     try:
-        filtered_model_settings = get_filtered_model_settings(model_settings)
+        filtered_model_settings = get_filtered_model_settings(userSettings['model_settings'])
         whisper_model = WhisperModel(**filtered_model_settings)
-        filtered_transcribe_settings = get_filtered_transcribe_settings(transcribe_settings)
+        filtered_transcribe_settings = get_filtered_transcribe_settings(userSettings['transcribe_settings'])
         
         event_loop = asyncio.new_event_loop()
         
-        transcriber = AudioTranscriber(event_loop, whisper_model, filtered_transcribe_settings, selected_audio_device_index)
+        transcriber = AudioTranscriber(event_loop, whisper_model, filtered_transcribe_settings, userSettings['app_settings']['audio-device-select'])
         asyncio.set_event_loop(event_loop)
         thread = threading.Thread(target=event_loop.run_forever, daemon=True)
         thread.start()
+        
+        write_json('settings', 'user_settings', {
+            'app_settings': userSettings['app_settings'], 
+            'model_settings': filtered_model_settings, 
+            'transcribe_settings': filtered_transcribe_settings
+        })
     
         asyncio.run_coroutine_threadsafe(transcriber.start_transcription(), event_loop)
     except Exception as e:
