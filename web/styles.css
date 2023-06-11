@@ -30,7 +30,7 @@ body {
 }
 
 .menu.active {
-  background-color: #888; 
+  background-color: #888;
   color: #000;
 }
 
@@ -94,13 +94,13 @@ body {
   transition: max-height 0.8s ease-out;
 }
 
-.content-inner .note{
+.content-inner .note {
   font-size: 0.9em;
-  color: #555"
+  color: #555;
 }
 
 #audio-device-select {
-  width: 800px
+  width: 800px;
 }
 
 .transcription-button {
@@ -116,13 +116,13 @@ body {
 }
 
 .transcription-button.start-button {
-  background-color: #4CAF50;
-  border: 2px solid #4CAF50;
+  background-color: #4caf50;
+  border: 2px solid #4caf50;
 }
 
 .transcription-button.start-button:hover {
   background-color: white;
-  color: #4CAF50;
+  color: #4caf50;
 }
 
 .transcription-button.stop-button {
@@ -155,7 +155,7 @@ body {
   background: #f8f8f8;
   border-radius: 10px;
   border: 1px solid #ddd;
-  font-family: 'Courier New', Courier, monospace;
+  font-family: "Courier New", Courier, monospace;
   font-size: 12px;
   line-height: 1.4;
   overflow: auto;
@@ -188,7 +188,7 @@ body {
 }
 
 .copy-button {
-  background-color: #008CBA;
+  background-color: #008cba;
   right: 85px;
 }
 
