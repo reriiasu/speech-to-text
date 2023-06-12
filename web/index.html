@@ -10,16 +10,12 @@
 
 <body>
   <div class="menus">
+    <div class="menu" id="app-settings">App Settings</div>
     <div class="menu" id="model-settings">Model Settings</div>
     <div class="menu" id="transcribe-settings">Transcribe Settings</div>
   </div>
   <div class="content" id="main-content">
     <div class="content-inner main open">
-      <div class="setting-item audio-device">
-        <label for="audio-device-select" class="setting-label" title="Please select the target audio device.">Audio
-          Device:</label>
-        <select id="audio-device-select" class="setting-control"></select>
-      </div>
       <button id="start-button" class="transcription-button start-button" onclick="startTranscription()">
         Start Transcription
       </button>
@@ -46,6 +42,37 @@
         </button>
         <pre id="console-message" class="message-area"></pre>
       </div>
+
+      <div class="content-window" id="app-settings-content" hidden>
+        <svg id="close-icon" class="close-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+          stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+        <div class="content-inner">
+          <p class="note">
+            <em>Note: Hover over the labels for more information.</em><br>
+            <em>* is Mandatory field.</em>
+          </p>
+          <div class="setting-item">
+            <label for="audio_device" class="setting-label" title="Please select the target audio device.">*Audio
+              Device:</label>
+            <select id="audio_device" class="setting-control"></select>
+          </div>
+          <div class="setting-item">
+            <label for="silence_limit" class="setting-label"
+              title="The silence limit is a threshold for deciding non-speaking status based on the count of consecutive silences detected.">*Silence
+              limit</label>
+            <input id="silence_limit" class="setting-control" type="number" min="0" value="8" />
+          </div>
+          <div class="setting-item">
+            <label for="noise_threshold" class="setting-label"
+              title="The noise_threshold is the threshold below which consecutive audio is considered noise.">*Noise
+              threshold:</label>
+            <input id="noise_threshold" class="setting-control" type="number" min="0" value="15" />
+          </div>
+        </div>
+      </div>
+
       <div class="content-window" id="model-settings-content" hidden>
         <svg id="close-icon" class="close-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
           stroke="currentColor">
@@ -91,13 +118,13 @@
             <label for="cpu_threads" class="setting-label"
               title="Number of threads to use when running on CPU (4 by default). A non-zero value overrides the OMP_NUM_THREADS environment variable.">*CPU
               Threads:</label>
-            <input id="cpu_threads" class="setting-control number" type="number" min="0" value="0" />
+            <input id="cpu_threads" class="setting-control" type="number" min="0" value="0" />
           </div>
           <div class="setting-item">
             <label for="num_workers" class="setting-label"
               title="When transcribe() is called from multiple Python threads, having multiple workers enables true parallelism when running the model (concurrent calls to self.model.generate() will run in parallel). This can improve the global throughput at the cost of increased memory usage.">*Number
               of Workers:</label>
-            <input id="num_workers" class="setting-control number" type="number" min="0" value="1" />
+            <input id="num_workers" class="setting-control" type="number" min="0" value="1" />
           </div>
           <div class="setting-item">
             <label for="download_root" class="setting-label"
@@ -155,26 +182,26 @@
             <label for="beam_size" class="setting-label" title="Beam size to use for decoding.">
               *Beam Size:
             </label>
-            <input id="beam_size" class="setting-control number" type="number" min="0" value="5" />
+            <input id="beam_size" class="setting-control" type="number" min="0" value="5" />
           </div>
           <div class="setting-item">
             <label for="best_of" class="setting-label"
               title="Number of candidates when sampling with non-zero temperature.">
               *Best Of:
             </label>
-            <input id="best_of" class="setting-control number" type="number" min="0" value="5" />
+            <input id="best_of" class="setting-control" type="number" min="0" value="5" />
           </div>
           <div class="setting-item">
             <label for="patience" class="setting-label" title="Beam search patience factor.">
               *Patience:
             </label>
-            <input id="patience" class="setting-control number" type="number" min="0" step="0.1" value="1" />
+            <input id="patience" class="setting-control" type="number" min="0" step="0.1" value="1" />
           </div>
           <div class="setting-item">
             <label for="length_penalty" class="setting-label" title="Exponential length penalty constant.">
               *Length Penalty:
             </label>
-            <input id="length_penalty" class="setting-control number" type="number" min="0" step="0.1" value="1" />
+            <input id="length_penalty" class="setting-control" type="number" min="0" step="0.1" value="1" />
           </div>
           <div class="setting-item">
             <label for="temperature" class="setting-label"
@@ -188,15 +215,15 @@
               title="If the gzip compression ratio is above this value, treat as failed.">
               Compression Ratio Threshold:
             </label>
-            <input id="compression_ratio_threshold" class="setting-control number optional" type="number" min="0"
-              step="0.1" value="2.4" />
+            <input id="compression_ratio_threshold" class="setting-control optional" type="number" min="0" step="0.1"
+              value="2.4" />
           </div>
           <div class="setting-item">
             <label for="log_prob_threshold" class="setting-label"
               title="If the average log probability over sampled tokens is below this value, treat as failed.">
               Log Probability Threshold:
             </label>
-            <input id="log_prob_threshold" class="setting-control number optional" type="number" min="-9" step="0.1"
+            <input id="log_prob_threshold" class="setting-control optional" type="number" min="-9" step="0.1"
               value="-1.0" />
           </div>
           <div class="setting-item">
@@ -204,7 +231,7 @@
               title="If the no_speech probability is higher than this value AND the average log probability over sampled tokens is below `log_prob_threshold`, consider the segment as silent.">
               No Speech Threshold:
             </label>
-            <input id="no_speech_threshold" class="setting-control number optional" type="number" min="0" step="0.1"
+            <input id="no_speech_threshold" class="setting-control optional" type="number" min="0" step="0.1"
               value="0.6" />
           </div>
           <div class="setting-item">
@@ -219,14 +246,14 @@
               title="Optional text to provide as a prompt for the first window.">
               Initial Prompt:
             </label>
-            <input id="initial_prompt" class="setting-control optional" />
+            <input id="initial_prompt" class="setting-control optional" type="text" />
           </div>
           <div class="setting-item">
             <label for="prefix" class="setting-label"
               title="Optional text to provide as a prefix for the first window.">
               Prefix:
             </label>
-            <input id="prefix" class="setting-control optional" />
+            <input id="prefix" class="setting-control optional" type="text" />
           </div>
           <div class="setting-item">
             <label for="suppress_blank" class="setting-label"
@@ -253,8 +280,7 @@
               title="The initial timestamp cannot be later than this.">
               *Max Initial Timestamp:
             </label>
-            <input id="max_initial_timestamp" class="setting-control number" type="number" min="0" step="0.1"
-              value="1.0" />
+            <input id="max_initial_timestamp" class="setting-control" type="number" min="0" step="0.1" value="1.0" />
           </div>
           <div class="setting-item">
             <label for="word_timestamps" class="setting-label"
@@ -268,14 +294,14 @@
               title="If word_timestamps is True, merge these punctuation symbols with the next word">
               *Prepend Punctuations:
             </label>
-            <input id="prepend_punctuations" class="setting-control" value="\&quot;'“¿([{-" />
+            <input id="prepend_punctuations" class="setting-control" type="text" value="\&quot;'“¿([{-" />
           </div>
           <div class="setting-item">
             <label for="append_punctuations" class="setting-label"
               title="If word_timestamps is True, merge these punctuation symbols with the previous word">
               *Append Punctuations:
             </label>
-            <input id="append_punctuations" class="setting-control" value="\&quot;'.。,，!！?？:：”)]}、" />
+            <input id="append_punctuations" class="setting-control" type="text" value="\&quot;'.。,，!！?？:：”)]}、" />
           </div>
           <div class="setting-item">
             <label for="vad_filter" class="setting-label"
@@ -289,7 +315,7 @@
               title="Dictionary of Silero VAD parameters or VadOptions class (see available parameters and default values in the class VadOptions).">
               VAD Parameters:
             </label>
-            <input id="vad_parameters" class="setting-control optional" />
+            <input id="vad_parameters" class="setting-control optional" type="text" />
           </div>
         </div>
       </div>

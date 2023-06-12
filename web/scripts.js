@@ -23,7 +23,7 @@ function transcription_stoppd() {
 
 async function updateDevices() {
   let devices = await eel.get_valid_devices()();
-  let select = document.getElementById("audio-device-select");
+  let select = document.getElementById("audio_device");
   select.innerHTML = "";
   for (let i = 0; i < devices.length; i++) {
     let opt = document.createElement("option");
@@ -59,6 +59,14 @@ function getContentSettings(elementid) {
   }, {});
 
   return json;
+}
+
+function getAppSettings() {
+  const settings = getContentSettings("#app-settings-content");
+  settings["audio_device"] =
+    document.getElementById("audio_device").selectedIndex;
+
+  return settings;
 }
 
 function getModelSettings() {
@@ -110,10 +118,7 @@ function startTranscription() {
   document.getElementById("start-button").disabled = true;
   document.getElementById("stop-button").disabled = false;
 
-  const appSettings = {
-    "audio-device-select": document.getElementById("audio-device-select")
-      .selectedIndex,
-  };
+  const appSettings = getAppSettings();
   const modelSettings = getModelSettings();
   const transcribeSettings = getTranscribeSettings();
 
@@ -171,7 +176,7 @@ window.addEventListener("load", (event) => {
   });
 
   eel.get_user_settings()(function (userSettings) {
-    setContentSettings(userSettings["app_settings"], "#main-content");
+    setContentSettings(userSettings["app_settings"], "#app-settings-content");
     setContentSettings(
       userSettings["model_settings"],
       "#model-settings-content"

@@ -24,5 +24,8 @@ Real-time transcription using [faster-whisper](https://github.com/guillaumekln/f
 
 ## Todo
 
-1. Try Silero VAD
-2. Allow local parameters to be set from the GUI.
+- [x] Save and load previous settings.
+
+- [ ] Try Silero VAD
+
+- [x] Allow local parameters to be set from the GUI.

@@ -4,24 +4,30 @@ import eel
 import queue
 import numpy as np
 
+from typing import NamedTuple
 from faster_whisper import WhisperModel
 from concurrent.futures import ThreadPoolExecutor
 from .utils.audio_utils import create_audio_stream
 from .utils.vad_utils import VadWrapper
 
+class AppOptions(NamedTuple):
+    audio_device: int
+    silence_limit: int = 8
+    noise_threshold: int = 15
+
 class AudioTranscriber:
     def __init__(
         self, event_loop:asyncio.AbstractEventLoop,
         whisper_model: WhisperModel,
-        transcribe_settings:dict,
-        selected_audio_device_index: int
+        transcribe_settings: dict,
+        app_options: AppOptions
     ):
         self.event_loop = event_loop
         self.whisper_model: WhisperModel = whisper_model
         self.transcribe_settings = transcribe_settings
-        self.selected_audio_device_index: int = selected_audio_device_index
+        self.app_options = app_options
         self.vad_wrapper = VadWrapper()
-        self.silent_chunks: int = 0
+        self.silence_counter: int = 0
         self.speech_buffer = []
         self.audio_queue = queue.Queue()
         self.transcribing = False
@@ -58,17 +64,17 @@ class AudioTranscriber:
         indataBytes = indata.tobytes()
         is_speech = self.vad_wrapper.is_speech(indataBytes)
         if is_speech:
-            self.silent_chunks = 0
+            self.silence_counter = 0
             audio_data = np.frombuffer(indataBytes, dtype=np.int16)
             self.speech_buffer.append(audio_data)
         else:
-            self.silent_chunks += 1
+            self.silence_counter += 1
 
         if (
             not is_speech
-            and self.silent_chunks > self.vad_wrapper.SILENT_CHUNKS_THRESHOLD
+            and self.silence_counter > self.app_options.silence_limit
         ):
-            if len(self.speech_buffer) > 15:
+            if len(self.speech_buffer) > self.app_options.noise_threshold:
                 audio_data_np = np.concatenate(self.speech_buffer)
                 self.speech_buffer.clear()
                 self.audio_queue.put(audio_data_np)
@@ -79,7 +85,7 @@ class AudioTranscriber:
     async def start_transcription(self):
         try:
             self.transcribing = True
-            self.stream = create_audio_stream(self.selected_audio_device_index, self.process_audio)
+            self.stream = create_audio_stream(self.app_options.audio_device, self.process_audio)
             self.stream.start()
             self._running.set()
             self._transcribe_task = asyncio.run_coroutine_threadsafe(self.transcribe_audio(), self.event_loop)

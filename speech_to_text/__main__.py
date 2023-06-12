@@ -4,6 +4,7 @@ import sys
 import threading
 
 from faster_whisper import WhisperModel
+from .audio_transcriber import AppOptions
 from .audio_transcriber import AudioTranscriber
 from .utils.audio_utils import get_valid_input_devices
 from .utils.file_utils import read_json, write_json
@@ -49,19 +50,20 @@ def get_user_settings():
 def start_transcription(userSettings):
     global transcriber, event_loop, thread
     try:
+        filtered_app_settings = get_filtered_app_settings(userSettings['app_settings'])
+        app_settings = AppOptions(**filtered_app_settings)
         filtered_model_settings = get_filtered_model_settings(userSettings['model_settings'])
         whisper_model = WhisperModel(**filtered_model_settings)
-        filtered_transcribe_settings = get_filtered_transcribe_settings(userSettings['transcribe_settings'])
-        
+        filtered_transcribe_settings = get_filtered_transcribe_settings(userSettings['transcribe_settings'])       
         event_loop = asyncio.new_event_loop()
         
-        transcriber = AudioTranscriber(event_loop, whisper_model, filtered_transcribe_settings, userSettings['app_settings']['audio-device-select'])
+        transcriber = AudioTranscriber(event_loop, whisper_model, filtered_transcribe_settings, app_settings)
         asyncio.set_event_loop(event_loop)
         thread = threading.Thread(target=event_loop.run_forever, daemon=True)
         thread.start()
         
         write_json('settings', 'user_settings', {
-            'app_settings': userSettings['app_settings'], 
+            'app_settings': filtered_app_settings, 
             'model_settings': filtered_model_settings, 
             'transcribe_settings': filtered_transcribe_settings
         })
@@ -88,6 +90,10 @@ def stop_transcription():
     thread = None    
     
     eel.transcription_stoppd()    
+
+def get_filtered_app_settings(settings):
+    valid_keys = AppOptions.__annotations__.keys()
+    return {k: v for k, v in settings.items() if k in valid_keys}
 
 def get_filtered_model_settings(settings):
     valid_keys = WhisperModel.__init__.__annotations__.keys()
