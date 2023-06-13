@@ -300,7 +300,7 @@ function clearMessage(elementId) {
 }
 
 function disableSettingControle() {
-  let elements = document.querySelector(".setting-control");
+  let elements = document.querySelectorAll(".setting-control");
 
   for (var i = 0; i < elements.length; i++) {
     elements[i].disabled = true;
@@ -308,7 +308,7 @@ function disableSettingControle() {
 }
 
 function enableSettingControle() {
-  let elements = document.querySelector(".setting-control");
+  let elements = document.querySelectorAll(".setting-control");
 
   for (var i = 0; i < elements.length; i++) {
     elements[i].disabled = false;
