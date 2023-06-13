@@ -34,13 +34,23 @@ body {
   color: #000;
 }
 
+.content-inner {
+  height: 100%;
+  margin: 10px 10px;
+  padding: 5px;
+  border-radius: 5px;
+  background-color: #fff;
+  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
 .setting-item {
   display: flex;
   align-items: center;
   margin-bottom: 10px;
 }
 
-.setting-item.audio_device {
+.setting-item.audio-device {
   display: block;
 }
 
@@ -62,7 +72,7 @@ input[type="number"].setting-control {
   width: 258px;
 }
 
-.content-window {
+.menu-window {
   position: absolute;
   top: 48px;
   right: 0;
@@ -80,8 +90,7 @@ input[type="number"].setting-control {
   color: #333;
 }
 
-.content-inner {
-  overflow: auto;
+.menu-window-inner {
   max-height: 0;
   margin: 10px 10px;
   padding: 5px;
@@ -91,13 +100,13 @@ input[type="number"].setting-control {
   overflow: hidden;
 }
 
-.content-inner.open {
+.menu-window-inner.open {
   background-color: rgba(255, 255, 255, 0.6);
   max-height: 1000px;
   transition: max-height 0.8s ease-out;
 }
 
-.content-inner .note {
+.menu-window-inner .note {
   font-size: 0.9em;
   color: #555;
 }

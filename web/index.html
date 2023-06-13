@@ -15,40 +15,46 @@
     <div class="menu" id="transcribe-settings">Transcribe Settings</div>
   </div>
   <div class="content" id="main-content">
-    <div class="content-inner main open">
-      <button id="start-button" class="transcription-button start-button" onclick="startTranscription()">
-        Start Transcription
-      </button>
-      <button id="stop-button" class="transcription-button stop-button" onclick="stopTranscription()" disabled>
-        Stop Transcription
-      </button>
-      <div class="recive-message-area">
+    <div class="content-inner">
+      <div class="action-button-area">
+        <button id="start-button" class="transcription-button start-button">
+          Start Transcription
+        </button>
+        <button id="stop-button" class="transcription-button stop-button" disabled>
+          Stop Transcription
+        </button>
+      </div>
+      <div class="recive-message-area transcription">
         <label>transcription result</label>
-        <button class="control-button copy-button" onclick="copyToClipboard('transcription')">
+        <button id="transcription-copy" class="control-button copy-button">
           Copy
         </button>
-        <button class="control-button clear-button" onclick="clearMessage('transcription')">
+        <button id="transcription-clear" class="control-button clear-button">
           Clear
         </button>
         <pre id="transcription" class="message-area"></pre>
       </div>
-      <div class="recive-message-area">
+      <div class="recive-message-area console">
         <label>console message</label>
-        <button class="control-button copy-button" onclick="copyToClipboard('console-message')">
+        <button id="console-message-copy" class="control-button copy-button">
           Copy
         </button>
-        <button class="control-button clear-button" onclick="clearMessage('console-message')">
+        <button id="console-message-clear" class="control-button clear-button">
           Clear
         </button>
         <pre id="console-message" class="message-area"></pre>
       </div>
 
-      <div class="content-window" id="app-settings-content" hidden>
+
+      <div id="toast" class="toast">Copied to clipboard!</div>
+    </div>
+    <div class="window">
+      <div class="menu-window" id="app-settings-window" hidden>
         <svg id="close-icon" class="close-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
           stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
         </svg>
-        <div class="content-inner">
+        <div class="menu-window-inner">
           <p class="note">
             <em>Note: Hover over the labels for more information.</em><br>
             <em>* is Mandatory field.</em>
@@ -73,12 +79,12 @@
         </div>
       </div>
 
-      <div class="content-window" id="model-settings-content" hidden>
+      <div class="menu-window" id="model-settings-window" hidden>
         <svg id="close-icon" class="close-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
           stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
         </svg>
-        <div class="content-inner">
+        <div class="menu-window-inner">
           <p class="note">
             <em>Note: Hover over the labels for more information.</em><br>
             <em>* is Mandatory field.</em>
@@ -142,24 +148,24 @@
         </div>
       </div>
 
-      <div class="content-window" id="transcribe-settings-content" hidden>
+      <div class="menu-window" id="transcribe-settings-window" hidden>
         <svg id="close-icon" class="close-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
           stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
         </svg>
-        <div class="content-inner">
+        <div class="menu-window-inner">
           <p class="note">
             <em>Note: Hover over the labels for more information.</em><br>
             <em>* is Mandatory field.</em>
           </p>
           <!-- audio file not supported -->
           <!-- <div class="setting-item">
-            <label for="audio" class="setting-label"
-              title="Path to the input file (or a file-like object), or the audio waveform.">
-              *Audio:
-            </label>
-            <input id="audio" class="setting-control" />
-          </div> -->
+          <label for="audio" class="setting-label"
+            title="Path to the input file (or a file-like object), or the audio waveform.">
+            *Audio:
+          </label>
+          <input id="audio" class="setting-control" />
+        </div> -->
           <div class="setting-item">
             <label for="language" class="setting-label"
               title="The language spoken in the audio. It should be a language code such as 'en' or 'fr'. If not set, the language will be detected in the first 30 seconds of audio.">
@@ -319,7 +325,6 @@
           </div>
         </div>
       </div>
-      <div id="toast" class="toast">Copied to clipboard!</div>
     </div>
   </div>
 </body>
