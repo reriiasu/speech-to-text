@@ -1,4 +1,13 @@
+html {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
 body {
+  height: 100%;
+  min-width: 510px;
+  min-height: 400px;
   font-family: Arial, sans-serif;
   margin: 0;
   padding: 0;
@@ -34,7 +43,15 @@ body {
   color: #000;
 }
 
+#main-content {
+  display: flex;
+  flex-direction: column;
+  height: calc(100% - 48px); /* Adjust for the height of the menu */
+}
+
 .content-inner {
+  display: flex;
+  flex-direction: column;
   height: 100%;
   margin: 10px 10px;
   padding: 5px;
@@ -113,7 +130,7 @@ input[type="number"].setting-control {
 
 .transcription-button {
   color: white;
-  padding: 15px 32px;
+  padding: 10px 24px;
   text-align: center;
   text-decoration: none;
   display: inline-block;
@@ -157,6 +174,19 @@ input[type="number"].setting-control {
   border: 2px solid #ccc;
 }
 
+.recive-message-area {
+  position: relative;
+}
+
+.recive-message-area.transcription {
+  flex-grow: 1;
+  overflow: auto;
+}
+
+.recive-message-area.console {
+  height: 165px;
+}
+
 .message-area {
   padding: 5px;
   margin: 10px;
@@ -174,11 +204,8 @@ input[type="number"].setting-control {
 }
 
 #transcription.message-area {
-  height: 625px;
-}
-
-.recive-message-area {
-  position: relative;
+  height: calc(100% - 38px);
+  box-sizing: border-box;
 }
 
 .control-button {
@@ -210,6 +237,7 @@ input[type="number"].setting-control {
 }
 
 ::-webkit-scrollbar {
+  height: 8px;
   width: 8px;
 }
 
