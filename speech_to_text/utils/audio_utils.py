@@ -1,5 +1,6 @@
 import sounddevice as sd
 
+
 # get a list of valid input devices
 def get_valid_input_devices():
     valid_devices = []
