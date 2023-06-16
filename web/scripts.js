@@ -87,9 +87,10 @@ function getModelSettings() {
 }
 
 function getTranscribeSettings() {
-  const settings = getContentSettings("#transcribe-settings-window");
+  const transcribeSettings = getContentSettings("#transcribe-settings-window");
+  const vadSettings = getContentSettings("#vad-settings-window");
 
-  const temperature = settings["temperature"];
+  const temperature = transcribeSettings["temperature"];
   if (/^(\d*\.?\d+|((\d*\.?\d+,)+\d*\.?\d+))$/.test(temperature)) {
     let numbers = 0;
     if (temperature.includes(",")) {
@@ -97,10 +98,10 @@ function getTranscribeSettings() {
     } else {
       numbers = Number(temperature);
     }
-    settings["temperature"] = numbers;
+    transcribeSettings["temperature"] = numbers;
   }
 
-  const suppress_tokens = settings["suppress_tokens"];
+  const suppress_tokens = transcribeSettings["suppress_tokens"];
   if (/^(-?\d+|(-?\d+,)+-?\d+)$/.test(suppress_tokens)) {
     let numbers = 0;
     if (suppress_tokens.includes(",")) {
@@ -108,9 +109,13 @@ function getTranscribeSettings() {
     } else {
       numbers = [Number(suppress_tokens)];
     }
-    settings["suppress_tokens"] = numbers;
+    transcribeSettings["suppress_tokens"] = numbers;
   }
-  return settings;
+  transcribeSettings["vad_filter"] = vadSettings["vad_filter"];
+  delete vadSettings["vad_filter"];
+  transcribeSettings["vad_parameters"] = vadSettings;
+
+  return transcribeSettings;
 }
 
 function startTranscription() {
@@ -186,6 +191,14 @@ function setUserSettings() {
     setContentSettings(
       userSettings["transcribe_settings"],
       "#transcribe-settings-window"
+    );
+    setContentSettings(
+      Object.assign(
+        {},
+        userSettings["transcribe_settings"],
+        userSettings["transcribe_settings"]["vad_parameters"]
+      ),
+      "#vad-settings-window"
     );
   });
 }

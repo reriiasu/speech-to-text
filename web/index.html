@@ -13,6 +13,7 @@
     <div class="menu" id="app-settings">App Settings</div>
     <div class="menu" id="model-settings">Model Settings</div>
     <div class="menu" id="transcribe-settings">Transcribe Settings</div>
+    <div class="menu" id="vad-settings">VAD Settings</div>
   </div>
   <div class="content" id="main-content">
     <div class="content-inner">
@@ -74,7 +75,7 @@
             <label for="noise_threshold" class="setting-label"
               title="The noise_threshold is the threshold below which consecutive audio is considered noise.">*Noise
               threshold:</label>
-            <input id="noise_threshold" class="setting-control" type="number" min="0" value="15" />
+            <input id="noise_threshold" class="setting-control" type="number" min="0" value="5" />
           </div>
         </div>
       </div>
@@ -309,6 +310,19 @@
             </label>
             <input id="append_punctuations" class="setting-control" type="text" value="\&quot;'.。,，!！?？:：”)]}、" />
           </div>
+        </div>
+      </div>
+
+      <div class="menu-window" id="vad-settings-window" hidden>
+        <svg id="close-icon" class="close-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+          stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+        <div class="menu-window-inner">
+          <p class="note">
+            <em>Note: Hover over the labels for more information.</em><br>
+            <em>* is Mandatory field.</em>
+          </p>
           <div class="setting-item">
             <label for="vad_filter" class="setting-label"
               title="Enable the voice activity detection (VAD) to filter out parts of the audio without speech. This step is using the Silero VAD model https://github.com/snakers4/silero-vad.">
@@ -321,11 +335,59 @@
               title="Dictionary of Silero VAD parameters or VadOptions class (see available parameters and default values in the class VadOptions).">
               VAD Parameters:
             </label>
-            <input id="vad_parameters" class="setting-control optional" type="text" />
           </div>
+          <div class="setting-item">
+            <label for="threshold" class="setting-label"
+              title="Speech threshold. Silero VAD outputs speech probabilities for each audio chunk, probabilities ABOVE this value are considered as SPEECH. It is better to tune this parameter for each dataset separately, but 'lazy' 0.5 is pretty good for most datasets.">
+              Threshold:
+            </label>
+            <input id="threshold" class="setting-control optional" type="number" min="0" step="0.1" value="0.5" />
+          </div>
+
+          <div class="setting-item">
+            <label for="min_speech_duration_ms" class="setting-label"
+              title="Final speech chunks shorter min_speech_duration_ms are thrown out.">
+              Min Speech Duration MS:
+            </label>
+            <input id="min_speech_duration_ms" class="setting-control optional" type="number" min="0" value="250" />
+          </div>
+
+          <div class="setting-item">
+            <label for="max_speech_duration_s" class="setting-label"
+              title="Maximum duration of speech chunks in seconds. Chunks longer than max_speech_duration_s will be split at the timestamp of the last silence that lasts more than 100s (if any), to prevent aggressive cutting. Otherwise, they will be split aggressively just before max_speech_duration_s.">
+              Max Speech Duration S:
+            </label>
+            <input id="max_speech_duration_s" class="setting-control optional" type="number" min="0" step="0.1" />
+          </div>
+
+          <div class="setting-item">
+            <label for="min_silence_duration_ms" class="setting-label"
+              title="In the end of each speech chunk wait for min_silence_duration_ms before separating it">
+              Min Silence Duration MS:
+            </label>
+            <input id="min_silence_duration_ms" class="setting-control optional" type="number" min="0" value="2000" />
+          </div>
+
+          <div class="setting-item">
+            <label for="window_size_samples" class="setting-label"
+              title="Audio chunks of window_size_samples size are fed to the silero VAD model. WARNING! Silero VAD models were trained using 512, 1024, 1536 samples for 16000 sample rate. Values other than these may affect model performance!!">
+              Window Size Samples:
+            </label>
+            <input id="window_size_samples" class="setting-control optional" type="number" min="0" value="1024" />
+          </div>
+
+          <div class="setting-item">
+            <label for="speech_pad_ms" class="setting-label"
+              title="Final speech chunks are padded by speech_pad_ms each side">
+              Speech Pad MS:
+            </label>
+            <input id="speech_pad_ms" class="setting-control optional" type="number" min="0" value="400" />
+          </div>
+
         </div>
       </div>
     </div>
+  </div>
   </div>
 </body>
 

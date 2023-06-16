@@ -30,7 +30,7 @@ class AudioTranscriber:
         self.app_options = app_options
         self.vad_wrapper = VadWrapper()
         self.silence_counter: int = 0
-        self.speech_buffer = []
+        self.audio_data_list = []
         self.audio_queue = queue.Queue()
         self.transcribing = False
         self.stream = None
@@ -44,11 +44,11 @@ class AudioTranscriber:
                     break
                 try:
                     # Get audio data from queue with a timeout
-                    audio_data_np = await self.event_loop.run_in_executor(executor, functools.partial(self.audio_queue.get, timeout=3.0))
+                    audio_data = await self.event_loop.run_in_executor(executor, functools.partial(self.audio_queue.get, timeout=3.0))
 
                     # Create a partial function for the model's transcribe method
                     func = functools.partial(
-                        self.whisper_model.transcribe, audio=audio_data_np, **self.transcribe_settings)
+                        self.whisper_model.transcribe, audio=audio_data, **self.transcribe_settings)
 
                     # Run the transcribe method in a thread
                     segments, _ = await self.event_loop.run_in_executor(executor, func)
@@ -63,13 +63,11 @@ class AudioTranscriber:
                     for arg in e.args:
                         eel.on_recive_message(arg)
 
-    def process_audio(self, indata, frames, time, status):
-        indataBytes = indata.tobytes()
-        is_speech = self.vad_wrapper.is_speech(indataBytes)
+    def process_audio(self, audio_data: np.ndarray, frames: int, time, status):
+        is_speech = self.vad_wrapper.is_speech(audio_data)
         if is_speech:
             self.silence_counter = 0
-            audio_data = np.frombuffer(indataBytes, dtype=np.int16)
-            self.speech_buffer.append(audio_data)
+            self.audio_data_list.append(audio_data.flatten())
         else:
             self.silence_counter += 1
 
@@ -77,13 +75,13 @@ class AudioTranscriber:
             not is_speech
             and self.silence_counter > self.app_options.silence_limit
         ):
-            if len(self.speech_buffer) > self.app_options.noise_threshold:
-                audio_data_np = np.concatenate(self.speech_buffer)
-                self.speech_buffer.clear()
-                self.audio_queue.put(audio_data_np)
+            if len(self.audio_data_list) > self.app_options.noise_threshold:
+                concatenate_audio_data = np.concatenate(self.audio_data_list)
+                self.audio_data_list.clear()
+                self.audio_queue.put(concatenate_audio_data)
             else:
                 # noise clear
-                self.speech_buffer.clear()
+                self.audio_data_list.clear()
 
     async def start_transcription(self):
         try:
