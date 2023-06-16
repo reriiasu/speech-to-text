@@ -11,10 +11,11 @@ Real-time transcription using [faster-whisper](https://github.com/guillaumekln/f
 ## Usage
 
 1. python -m speech_to_text
-2. Select Input Audio Device
-3. Select "Model Settings" and configure the settings.
-4. Select "Transcribe Settings" and configure the settings.
-5. Start Transcription
+1. Select "App Settings" and configure the settings.
+1. Select "Model Settings" and configure the settings.
+1. Select "Transcribe Settings" and configure the settings.
+1. Select "VAD Settings" and configure the settings.
+1. Start Transcription
 
 ## Notes
 
@@ -26,6 +27,6 @@ Real-time transcription using [faster-whisper](https://github.com/guillaumekln/f
 
 - [x] Save and load previous settings.
 
-- [ ] Try Silero VAD
+- [x] Use Silero VAD
 
 - [x] Allow local parameters to be set from the GUI.
