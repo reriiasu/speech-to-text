@@ -14,7 +14,7 @@ from .utils.vad_utils import VadWrapper
 class AppOptions(NamedTuple):
     audio_device: int
     silence_limit: int = 8
-    noise_threshold: int = 15
+    noise_threshold: int = 5
 
 
 class AudioTranscriber:
@@ -75,6 +75,7 @@ class AudioTranscriber:
             not is_speech
             and self.silence_counter > self.app_options.silence_limit
         ):
+            self.silence_counter = 0
             if len(self.audio_data_list) > self.app_options.noise_threshold:
                 concatenate_audio_data = np.concatenate(self.audio_data_list)
                 self.audio_data_list.clear()

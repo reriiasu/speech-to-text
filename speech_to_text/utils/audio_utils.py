@@ -17,7 +17,7 @@ def get_valid_input_devices():
 # create an audio stream
 def create_audio_stream(selected_device, callback):
     RATE = 16000
-    CHUNK = 1024
+    CHUNK = 512
     CHANNELS = 1
     DTYPE = "float32"
 
