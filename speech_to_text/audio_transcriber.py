@@ -8,7 +8,7 @@ from typing import NamedTuple
 from faster_whisper import WhisperModel
 from concurrent.futures import ThreadPoolExecutor
 from .utils.audio_utils import create_audio_stream
-from .utils.vad_utils import VadWrapper
+from .utils.vad_utils import VadUtils
 
 
 class AppOptions(NamedTuple):
@@ -28,7 +28,7 @@ class AudioTranscriber:
         self.whisper_model: WhisperModel = whisper_model
         self.transcribe_settings = transcribe_settings
         self.app_options = app_options
-        self.vad_wrapper = VadWrapper()
+        self.vad_wrapper = VadUtils()
         self.silence_counter: int = 0
         self.audio_data_list = []
         self.audio_queue = queue.Queue()
@@ -40,8 +40,6 @@ class AudioTranscriber:
     async def transcribe_audio(self):
         with ThreadPoolExecutor() as executor:
             while self.transcribing:
-                if not self.transcribing:
-                    break
                 try:
                     # Get audio data from queue with a timeout
                     audio_data = await self.event_loop.run_in_executor(executor, functools.partial(self.audio_queue.get, timeout=3.0))
@@ -117,6 +115,5 @@ class AudioTranscriber:
             else:
                 eel.on_recive_message("No active stream to stop.")
         except Exception as e:
-            print(e)
             for arg in e.args:
                 eel.on_recive_message(arg)
