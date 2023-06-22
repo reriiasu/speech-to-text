@@ -58,8 +58,7 @@ class AudioTranscriber:
                     # Skip to the next iteration if a timeout occurs
                     continue
                 except Exception as e:
-                    for arg in e.args:
-                        eel.on_recive_message(arg)
+                    eel.on_recive_message(str(e))
 
     def process_audio(self, audio_data: np.ndarray, frames: int, time, status):
         is_speech = self.vad_wrapper.is_speech(audio_data)
@@ -95,8 +94,7 @@ class AudioTranscriber:
             while self._running.is_set():
                 await asyncio.sleep(1)
         except Exception as e:
-            for arg in e.args:
-                eel.on_recive_message(arg)
+            eel.on_recive_message(str(e))
 
     async def stop_transcription(self):
         try:
@@ -115,5 +113,4 @@ class AudioTranscriber:
             else:
                 eel.on_recive_message("No active stream to stop.")
         except Exception as e:
-            for arg in e.args:
-                eel.on_recive_message(arg)
+            eel.on_recive_message(str(e))

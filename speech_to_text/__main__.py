@@ -44,8 +44,7 @@ def get_user_settings():
         for data_type in data_types:
             userSettings[data_type] = data[data_type]
     except Exception as e:
-        for arg in e.args:
-            eel.on_recive_message(arg)
+        eel.on_recive_message(str(e))
 
     return userSettings
 
@@ -79,8 +78,7 @@ def start_transcription(userSettings):
         asyncio.run_coroutine_threadsafe(
             transcriber.start_transcription(), event_loop)
     except Exception as e:
-        for arg in e.args:
-            eel.on_recive_message(arg)
+        eel.on_recive_message(str(e))
 
 
 @eel.expose
