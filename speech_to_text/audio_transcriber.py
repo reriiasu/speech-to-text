@@ -19,10 +19,11 @@ class AppOptions(NamedTuple):
 
 class AudioTranscriber:
     def __init__(
-        self, event_loop: asyncio.AbstractEventLoop,
+        self,
+        event_loop: asyncio.AbstractEventLoop,
         whisper_model: WhisperModel,
         transcribe_settings: dict,
-        app_options: AppOptions
+        app_options: AppOptions,
     ):
         self.event_loop = event_loop
         self.whisper_model: WhisperModel = whisper_model
@@ -42,11 +43,16 @@ class AudioTranscriber:
             while self.transcribing:
                 try:
                     # Get audio data from queue with a timeout
-                    audio_data = await self.event_loop.run_in_executor(executor, functools.partial(self.audio_queue.get, timeout=3.0))
+                    audio_data = await self.event_loop.run_in_executor(
+                        executor, functools.partial(self.audio_queue.get, timeout=3.0)
+                    )
 
                     # Create a partial function for the model's transcribe method
                     func = functools.partial(
-                        self.whisper_model.transcribe, audio=audio_data, **self.transcribe_settings)
+                        self.whisper_model.transcribe,
+                        audio=audio_data,
+                        **self.transcribe_settings
+                    )
 
                     # Run the transcribe method in a thread
                     segments, _ = await self.event_loop.run_in_executor(executor, func)
@@ -68,10 +74,7 @@ class AudioTranscriber:
         else:
             self.silence_counter += 1
 
-        if (
-            not is_speech
-            and self.silence_counter > self.app_options.silence_limit
-        ):
+        if not is_speech and self.silence_counter > self.app_options.silence_limit:
             self.silence_counter = 0
             if len(self.audio_data_list) > self.app_options.noise_threshold:
                 concatenate_audio_data = np.concatenate(self.audio_data_list)
@@ -85,11 +88,13 @@ class AudioTranscriber:
         try:
             self.transcribing = True
             self.stream = create_audio_stream(
-                self.app_options.audio_device, self.process_audio)
+                self.app_options.audio_device, self.process_audio
+            )
             self.stream.start()
             self._running.set()
             self._transcribe_task = asyncio.run_coroutine_threadsafe(
-                self.transcribe_audio(), self.event_loop)
+                self.transcribe_audio(), self.event_loop
+            )
             eel.on_recive_message("Transcription started.")
             while self._running.is_set():
                 await asyncio.sleep(1)
@@ -100,8 +105,7 @@ class AudioTranscriber:
         try:
             self.transcribing = False
             if self._transcribe_task is not None:
-                self.event_loop.call_soon_threadsafe(
-                    self._transcribe_task.cancel)
+                self.event_loop.call_soon_threadsafe(self._transcribe_task.cancel)
                 self._transcribe_task = None
 
             if self.stream is not None:

@@ -9,7 +9,7 @@ from .audio_transcriber import AudioTranscriber
 from .utils.audio_utils import get_valid_input_devices
 from .utils.file_utils import read_json, write_json
 
-eel.init('web')
+eel.init("web")
 
 transcriber: AudioTranscriber = None
 event_loop: asyncio.AbstractEventLoop = None
@@ -19,16 +19,22 @@ thread: threading.Thread = None
 @eel.expose
 def get_valid_devices():
     devices = get_valid_input_devices()
-    return [{'index': d['index'], 'name':  f"{d['name']} {d['host_api_name']} ({d['max_input_channels']} in)"} for d in devices]
+    return [
+        {
+            "index": d["index"],
+            "name": f"{d['name']} {d['host_api_name']} ({d['max_input_channels']} in)",
+        }
+        for d in devices
+    ]
 
 
 @eel.expose
 def get_dropdown_options():
-    data_types = ['model_sizes', 'compute_types', 'languages']
+    data_types = ["model_sizes", "compute_types", "languages"]
 
     dropdown_options = {}
     for data_type in data_types:
-        data = read_json('assets', data_type)
+        data = read_json("assets", data_type)
         dropdown_options[data_type] = data[data_type]
 
     return dropdown_options
@@ -36,11 +42,11 @@ def get_dropdown_options():
 
 @eel.expose
 def get_user_settings():
-    data_types = ['app_settings', 'model_settings', 'transcribe_settings']
+    data_types = ["app_settings", "model_settings", "transcribe_settings"]
     userSettings = {}
 
     try:
-        data = read_json('settings', 'user_settings')
+        data = read_json("settings", "user_settings")
         for data_type in data_types:
             userSettings[data_type] = data[data_type]
     except Exception as e:
@@ -53,30 +59,35 @@ def get_user_settings():
 def start_transcription(userSettings):
     global transcriber, event_loop, thread
     try:
-        filtered_app_settings = get_filtered_app_settings(
-            userSettings['app_settings'])
+        filtered_app_settings = get_filtered_app_settings(userSettings["app_settings"])
         app_settings = AppOptions(**filtered_app_settings)
         filtered_model_settings = get_filtered_model_settings(
-            userSettings['model_settings'])
+            userSettings["model_settings"]
+        )
         whisper_model = WhisperModel(**filtered_model_settings)
         filtered_transcribe_settings = get_filtered_transcribe_settings(
-            userSettings['transcribe_settings'])
+            userSettings["transcribe_settings"]
+        )
         event_loop = asyncio.new_event_loop()
 
         transcriber = AudioTranscriber(
-            event_loop, whisper_model, filtered_transcribe_settings, app_settings)
+            event_loop, whisper_model, filtered_transcribe_settings, app_settings
+        )
         asyncio.set_event_loop(event_loop)
         thread = threading.Thread(target=event_loop.run_forever, daemon=True)
         thread.start()
 
-        write_json('settings', 'user_settings', {
-            'app_settings': filtered_app_settings,
-            'model_settings': filtered_model_settings,
-            'transcribe_settings': filtered_transcribe_settings
-        })
+        write_json(
+            "settings",
+            "user_settings",
+            {
+                "app_settings": filtered_app_settings,
+                "model_settings": filtered_model_settings,
+                "transcribe_settings": filtered_transcribe_settings,
+            },
+        )
 
-        asyncio.run_coroutine_threadsafe(
-            transcriber.start_transcription(), event_loop)
+        asyncio.run_coroutine_threadsafe(transcriber.start_transcription(), event_loop)
     except Exception as e:
         eel.on_recive_message(str(e))
 
@@ -88,7 +99,8 @@ def stop_transcription():
         eel.transcription_stoppd()
         return
     future = asyncio.run_coroutine_threadsafe(
-        transcriber.stop_transcription(), event_loop)
+        transcriber.stop_transcription(), event_loop
+    )
     future.result()
 
     if thread.is_alive():
@@ -117,7 +129,7 @@ def get_filtered_transcribe_settings(settings):
 
 
 def on_close(page, sockets):
-    print(page, 'was closed')
+    print(page, "was closed")
 
     if transcriber and transcriber.transcribing:
         stop_transcription()
@@ -125,4 +137,4 @@ def on_close(page, sockets):
 
 
 if __name__ == "__main__":
-    eel.start('index.html', size=(1024, 1024), close_callback=on_close)
+    eel.start("index.html", size=(1024, 1024), close_callback=on_close)

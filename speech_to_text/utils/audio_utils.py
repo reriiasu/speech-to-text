@@ -8,8 +8,8 @@ def get_valid_input_devices():
     hostapis = sd.query_hostapis()
 
     for device in devices:
-        if device['max_input_channels'] > 0:
-            device['host_api_name'] = hostapis[device['hostapi']]['name']
+        if device["max_input_channels"] > 0:
+            device["host_api_name"] = hostapis[device["hostapi"]]["name"]
             valid_devices.append(device)
     return valid_devices
 
@@ -27,7 +27,7 @@ def create_audio_stream(selected_device, callback):
         samplerate=RATE,
         callback=callback,
         dtype=DTYPE,
-        blocksize=CHUNK
+        blocksize=CHUNK,
     )
 
     return stream
