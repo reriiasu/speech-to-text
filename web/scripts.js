@@ -1,17 +1,32 @@
 eel.expose(on_recive_message);
 function on_recive_message(message) {
-  const messageArea = document.querySelector("#console-message");
-  messageArea.textContent += message + "\n";
-
-  messageArea.scrollTop = messageArea.scrollHeight;
+  addMessage("console-message", message);
 }
 
 eel.expose(display_transcription);
 function display_transcription(transcript) {
-  const transcriptArea = document.querySelector("#transcription");
-  transcriptArea.innerText += transcript + "\n";
+  addMessage("transcription", transcript);
+}
 
-  transcriptArea.scrollTop = transcriptArea.scrollHeight;
+eel.expose(on_recive_segments);
+function on_recive_segments(segments) {
+  clearMessage("transcription");
+  const audio = document.getElementById("audio-control");
+  audio.src = "voice.wav" + "?v=" + new Date().getTime();
+  audio.hidden = false;
+  audio.load();
+
+  const transcription = document.querySelector(`#transcription`);
+  for (let i = 0; i < segments.length; i++) {
+    const newel = document.createElement("div");
+    newel.textContent = segments[i]["text"];
+    newel.setAttribute("data-start", segments[i]["start"]);
+    newel.setAttribute("data-end", segments[i]["end"]);
+
+    newel.addEventListener("click", onClickTranscription);
+
+    transcription.appendChild(newel);
+  }
 }
 
 eel.expose(transcription_stoppd);
@@ -19,6 +34,21 @@ function transcription_stoppd() {
   document.querySelector("#start-button").disabled = false;
   document.querySelector("#stop-button").disabled = true;
   enableSettingControle();
+}
+
+function addMessage(elementId, message) {
+  const el = document.querySelector(`#${elementId}`);
+  const newel = document.createElement("div");
+  newel.textContent = message;
+  el.appendChild(newel);
+
+  el.scrollTop = el.scrollHeight;
+}
+
+function onClickTranscription(event) {
+  const audio = document.getElementById("audio-control");
+  audio.currentTime = event.target.getAttribute("data-start");
+  audio.play();
 }
 
 async function updateDevices() {
@@ -123,6 +153,8 @@ function startTranscription() {
   disableSettingControle();
   document.getElementById("start-button").disabled = true;
   document.getElementById("stop-button").disabled = false;
+  clearAudioControl();
+  clearMessage("transcription");
 
   const appSettings = getAppSettings();
   const modelSettings = getModelSettings();
@@ -261,6 +293,7 @@ function addButtonClickEventListener() {
   document
     .querySelector("#transcription-clear")
     .addEventListener("click", () => {
+      clearAudioControl();
       clearMessage("transcription");
     });
 
@@ -276,11 +309,34 @@ function addButtonClickEventListener() {
     });
 }
 
+function addTimeupdateEventListener() {
+  const audio = document.querySelector(`#audio-control`);
+
+  audio.addEventListener("timeupdate", (event) => {
+    const currentTime = event.target.currentTime;
+    const subtitles = Array.from(
+      document.getElementById("transcription").children
+    );
+
+    subtitles.forEach((subtitle) => {
+      const start = parseFloat(subtitle.getAttribute("data-start"));
+      const end = parseFloat(subtitle.getAttribute("data-end"));
+
+      if (currentTime >= start && currentTime <= end) {
+        subtitle.classList.add("highlight");
+      } else {
+        subtitle.classList.remove("highlight");
+      }
+    });
+  });
+}
+
 window.addEventListener("load", (event) => {
   updateDevices();
   setDropdownOptions();
   setUserSettings();
   addButtonClickEventListener();
+  addTimeupdateEventListener();
 });
 
 function copyToClipboard(elementId) {
@@ -306,10 +362,18 @@ function showToast() {
 }
 
 function clearMessage(elementId) {
-  const transcriptElement = document.querySelector(
-    `#${elementId}.message-area`
-  );
-  transcriptElement.textContent = "";
+  const el = document.querySelector(`#${elementId}`);
+
+  while (el.firstChild) {
+    el.firstChild.remove();
+  }
+}
+
+function clearAudioControl() {
+  const audio = document.getElementById("audio-control");
+  audio.pause();
+  audio.src = "";
+  audio.hidden = true;
 }
 
 function disableSettingControle() {

@@ -9,12 +9,14 @@ from faster_whisper import WhisperModel
 from concurrent.futures import ThreadPoolExecutor
 from .utils.audio_utils import create_audio_stream
 from .utils.vad_utils import VadUtils
+from .utils.file_utils import write_audio
 
 
 class AppOptions(NamedTuple):
     audio_device: int
     silence_limit: int = 8
     noise_threshold: int = 5
+    create_audio_file: bool = True
 
 
 class AudioTranscriber:
@@ -32,6 +34,7 @@ class AudioTranscriber:
         self.vad_wrapper = VadUtils()
         self.silence_counter: int = 0
         self.audio_data_list = []
+        self.all_audio_data_list = []
         self.audio_queue = queue.Queue()
         self.transcribing = False
         self.stream = None
@@ -51,7 +54,7 @@ class AudioTranscriber:
                     func = functools.partial(
                         self.whisper_model.transcribe,
                         audio=audio_data,
-                        **self.transcribe_settings
+                        **self.transcribe_settings,
                     )
 
                     # Run the transcribe method in a thread
@@ -76,6 +79,10 @@ class AudioTranscriber:
 
         if not is_speech and self.silence_counter > self.app_options.silence_limit:
             self.silence_counter = 0
+
+            if self.app_options.create_audio_file:
+                self.all_audio_data_list.extend(self.audio_data_list)
+
             if len(self.audio_data_list) > self.app_options.noise_threshold:
                 concatenate_audio_data = np.concatenate(self.audio_data_list)
                 self.audio_data_list.clear()
@@ -83,6 +90,23 @@ class AudioTranscriber:
             else:
                 # noise clear
                 self.audio_data_list.clear()
+
+    def batch_transcribe_audio(self, audio_data: np.ndarray):
+        segment_list = []
+
+        segments, _ = self.whisper_model.transcribe(
+            audio=audio_data, **self.transcribe_settings
+        )
+
+        for segment in segments:
+            segment_list.append(
+                {
+                    "start": segment.start,
+                    "end": segment.end,
+                    "text": f"[{segment.start:.2f}s -> {segment.end:.2f}s] {segment.text}",
+                }
+            )
+        eel.on_recive_segments(segment_list)
 
     async def start_transcription(self):
         try:
@@ -107,6 +131,12 @@ class AudioTranscriber:
             if self._transcribe_task is not None:
                 self.event_loop.call_soon_threadsafe(self._transcribe_task.cancel)
                 self._transcribe_task = None
+
+            if self.app_options.create_audio_file:
+                audio_data = np.concatenate(self.all_audio_data_list)
+                write_audio("web", "voice", audio_data)
+                self.batch_transcribe_audio(audio_data)
+                self.all_audio_data_list.clear()
 
             if self.stream is not None:
                 self._running.clear()

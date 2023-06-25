@@ -59,15 +59,14 @@ def get_user_settings():
 def start_transcription(userSettings):
     global transcriber, event_loop, thread
     try:
-        filtered_app_settings = get_filtered_app_settings(userSettings["app_settings"])
-        app_settings = AppOptions(**filtered_app_settings)
-        filtered_model_settings = get_filtered_model_settings(
-            userSettings["model_settings"]
-        )
+        (
+            filtered_app_settings,
+            filtered_model_settings,
+            filtered_transcribe_settings,
+        ) = extracting_each_setting(userSettings)
+
         whisper_model = WhisperModel(**filtered_model_settings)
-        filtered_transcribe_settings = get_filtered_transcribe_settings(
-            userSettings["transcribe_settings"]
-        )
+        app_settings = AppOptions(**filtered_app_settings)
         event_loop = asyncio.new_event_loop()
 
         transcriber = AudioTranscriber(
@@ -76,16 +75,6 @@ def start_transcription(userSettings):
         asyncio.set_event_loop(event_loop)
         thread = threading.Thread(target=event_loop.run_forever, daemon=True)
         thread.start()
-
-        write_json(
-            "settings",
-            "user_settings",
-            {
-                "app_settings": filtered_app_settings,
-                "model_settings": filtered_model_settings,
-                "transcribe_settings": filtered_transcribe_settings,
-            },
-        )
 
         asyncio.run_coroutine_threadsafe(transcriber.start_transcription(), event_loop)
     except Exception as e:
@@ -126,6 +115,28 @@ def get_filtered_model_settings(settings):
 def get_filtered_transcribe_settings(settings):
     valid_keys = WhisperModel.transcribe.__annotations__.keys()
     return {k: v for k, v in settings.items() if k in valid_keys}
+
+
+def extracting_each_setting(userSettings):
+    filtered_app_settings = get_filtered_app_settings(userSettings["app_settings"])
+    filtered_model_settings = get_filtered_model_settings(
+        userSettings["model_settings"]
+    )
+    filtered_transcribe_settings = get_filtered_transcribe_settings(
+        userSettings["transcribe_settings"]
+    )
+
+    write_json(
+        "settings",
+        "user_settings",
+        {
+            "app_settings": filtered_app_settings,
+            "model_settings": filtered_model_settings,
+            "transcribe_settings": filtered_transcribe_settings,
+        },
+    )
+
+    return filtered_app_settings, filtered_model_settings, filtered_transcribe_settings
 
 
 def on_close(page, sockets):

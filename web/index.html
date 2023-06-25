@@ -17,35 +17,48 @@
   </div>
   <div class="content" id="main-content">
     <div class="content-inner">
-      <div class="action-button-area">
+      <div>
+        <label class="main-content-label" id="mode">Real-time transcription</label>
+      </div>
+      <div id="subtitle"></div>
+      <div class="transcription-controls">
         <button id="start-button" class="transcription-button start-button">
           Start Transcription
         </button>
         <button id="stop-button" class="transcription-button stop-button" disabled>
           Stop Transcription
         </button>
+        <audio id="audio-control" controls hidden>
+          <source type="audio/wav">
+          Your browser does not support the audio element.
+        </audio>
       </div>
       <div class="recive-message-area transcription">
-        <label>transcription result</label>
+        <div>
+          <label class="main-content-label">transcription result</label>
+        </div>
         <button id="transcription-copy" class="control-button copy-button">
           Copy
         </button>
         <button id="transcription-clear" class="control-button clear-button">
           Clear
         </button>
-        <pre id="transcription" class="message-area"></pre>
+        <div id="transcription" class="message-area">
+        </div>
       </div>
       <div class="recive-message-area console">
-        <label>console message</label>
+        <div>
+          <label class="main-content-label">console message</label>
+        </div>
         <button id="console-message-copy" class="control-button copy-button">
           Copy
         </button>
         <button id="console-message-clear" class="control-button clear-button">
           Clear
         </button>
-        <pre id="console-message" class="message-area"></pre>
+        <div id="console-message" class="message-area">
+        </div>
       </div>
-
 
       <div id="toast" class="toast">Copied to clipboard!</div>
     </div>
@@ -76,6 +89,12 @@
               title="The noise_threshold is the threshold below which consecutive audio is considered noise.">*Noise
               threshold:</label>
             <input id="noise_threshold" class="setting-control" type="number" min="0" value="5" />
+          </div>
+          <div class="setting-item">
+            <label for="create_audio_file" class="setting-label"
+              title="Create an audio file after stopping the transcription, and coordinate it with the transcription.">*Create
+              Audio File:</label>
+            <input type="checkbox" id="create_audio_file" class="setting-control" checked />
           </div>
         </div>
       </div>
@@ -387,7 +406,6 @@
         </div>
       </div>
     </div>
-  </div>
   </div>
 </body>
 

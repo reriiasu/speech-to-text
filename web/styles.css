@@ -61,6 +61,20 @@ body {
   overflow: hidden;
 }
 
+.main-content-label {
+  display: inline-block;
+  margin-left: 2px;
+  padding: 2px 10px;
+  background-color: transparent;
+  color: #333;
+  font-size: 14px;
+  box-sizing: border-box;
+}
+
+.main-content-label#mode {
+  border-bottom: 2px solid #333;
+}
+
 .setting-item {
   display: flex;
   align-items: center;
@@ -128,7 +142,13 @@ input[type="number"].setting-control {
   color: #555;
 }
 
+.transcription-controls {
+  display: flex;
+  justify-content: flex-start;
+}
+
 .transcription-button {
+  height: 50px;
   color: white;
   padding: 10px 24px;
   text-align: center;
@@ -193,19 +213,33 @@ input[type="number"].setting-control {
   background: #f8f8f8;
   border-radius: 10px;
   border: 1px solid #ddd;
-  font-family: "Courier New", Courier, monospace;
   font-size: 12px;
   line-height: 1.4;
   overflow: auto;
   height: 120px;
-  white-space: pre-wrap;
   scrollbar-width: thin;
   scrollbar-color: #888 #f1f1f1;
 }
 
+.message-area > div {
+  word-wrap: break-word;
+  white-space: normal;
+}
+
+.message-area > div::after {
+  content: "\a";
+  white-space: pre;
+}
+
 #transcription.message-area {
-  height: calc(100% - 38px);
+  height: calc(100% - 40px);
   box-sizing: border-box;
+}
+
+.highlight {
+  color: white;
+  background-color: rgba(0, 0, 0, 0.7);
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
 }
 
 .control-button {
