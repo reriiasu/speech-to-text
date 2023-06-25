@@ -107,6 +107,7 @@ input[type="number"].setting-control {
   position: absolute;
   top: 48px;
   right: 0;
+  width: 448px;
   transition: max-height 0.5s ease;
   z-index: 1;
 }
