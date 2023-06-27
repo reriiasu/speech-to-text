@@ -11,7 +11,7 @@ function display_transcription(transcript) {
 eel.expose(on_recive_segments);
 function on_recive_segments(segments) {
   clearMessage("transcription");
-  const audio = document.getElementById("audio-control");
+  const audio = document.querySelector("#audio-control");
   audio.src = "voice.wav" + "?v=" + new Date().getTime();
   audio.hidden = false;
   audio.load();
@@ -46,7 +46,7 @@ function addMessage(elementId, message) {
 }
 
 function onClickTranscription(event) {
-  const audio = document.getElementById("audio-control");
+  const audio = document.querySelector("#audio-control");
   audio.currentTime = event.target.getAttribute("data-start");
   audio.play();
 }
@@ -94,7 +94,7 @@ function getContentSettings(elementid) {
 function getAppSettings() {
   const settings = getContentSettings("#app-settings-window");
   settings["audio_device"] =
-    document.getElementById("audio_device").selectedIndex;
+    document.querySelector("#audio_device").selectedIndex;
 
   return settings;
 }
@@ -151,8 +151,8 @@ function getTranscribeSettings() {
 function startTranscription() {
   menuClose();
   disableSettingControle();
-  document.getElementById("start-button").disabled = true;
-  document.getElementById("stop-button").disabled = false;
+  document.querySelector("#start-button").disabled = true;
+  document.querySelector("#stop-button").disabled = false;
   clearAudioControl();
   clearMessage("transcription");
 
@@ -172,7 +172,7 @@ async function stopTranscription() {
 }
 
 function createDropdownOptions(options, elementId) {
-  const select = document.getElementById(elementId);
+  const select = document.querySelector(`#${elementId}`);
   for (const key in options) {
     const option = document.createElement("option");
     option.value = key;
@@ -315,7 +315,7 @@ function addTimeupdateEventListener() {
   audio.addEventListener("timeupdate", (event) => {
     const currentTime = event.target.currentTime;
     const subtitles = Array.from(
-      document.getElementById("transcription").children
+      document.querySelector("#transcription").children
     );
 
     subtitles.forEach((subtitle) => {
@@ -340,7 +340,7 @@ window.addEventListener("load", (event) => {
 });
 
 function copyToClipboard(elementId) {
-  const transcriptionElement = document.getElementById(elementId);
+  const transcriptionElement = document.querySelector(`#${elementId}`);
   const text = transcriptionElement.innerText;
   navigator.clipboard.writeText(text).then(
     function () {
@@ -370,7 +370,7 @@ function clearMessage(elementId) {
 }
 
 function clearAudioControl() {
-  const audio = document.getElementById("audio-control");
+  const audio = document.querySelector("#audio-control");
   audio.pause();
   audio.src = "";
   audio.hidden = true;
