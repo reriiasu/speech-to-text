@@ -132,11 +132,11 @@ class AudioTranscriber:
                 self.event_loop.call_soon_threadsafe(self._transcribe_task.cancel)
                 self._transcribe_task = None
 
-            if self.app_options.create_audio_file:
+            if self.app_options.create_audio_file and len(self.all_audio_data_list) > 0:
                 audio_data = np.concatenate(self.all_audio_data_list)
+                self.all_audio_data_list.clear()
                 write_audio("web", "voice", audio_data)
                 self.batch_transcribe_audio(audio_data)
-                self.all_audio_data_list.clear()
 
             if self.stream is not None:
                 self._running.clear()

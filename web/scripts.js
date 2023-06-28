@@ -1,5 +1,6 @@
 eel.expose(on_recive_message);
 function on_recive_message(message) {
+  document.querySelector("#loading-screen").classList.remove("show");
   addMessage("console-message", message);
 }
 
@@ -10,11 +11,16 @@ function display_transcription(transcript) {
 
 eel.expose(on_recive_segments);
 function on_recive_segments(segments) {
+  document.querySelector("#loading-screen").classList.remove("show");
   clearMessage("transcription");
   const audio = document.querySelector("#audio-control");
-  audio.src = "voice.wav" + "?v=" + new Date().getTime();
-  audio.hidden = false;
-  audio.load();
+
+  const appSettings = getAppSettings();
+  if (appSettings["create_audio_file"]) {
+    audio.src = "voice.wav" + "?v=" + new Date().getTime();
+    audio.hidden = false;
+    audio.load();
+  }
 
   const transcription = document.querySelector(`#transcription`);
   for (let i = 0; i < segments.length; i++) {
@@ -31,8 +37,16 @@ function on_recive_segments(segments) {
 
 eel.expose(transcription_stoppd);
 function transcription_stoppd() {
-  document.querySelector("#start-button").disabled = false;
-  document.querySelector("#stop-button").disabled = true;
+  document.querySelector("#start-button").classList.remove("hidden");
+  document.querySelector("#stop-button").classList.add("hidden");
+  enableSettingControle();
+  enableModeControle();
+}
+
+eel.expose(transcription_stoppd2);
+function transcription_stoppd2() {
+  document.querySelector("#start-button").classList.remove("hidden");
+  document.querySelector("#stop-button").classList.add("hidden");
   enableSettingControle();
 }
 
@@ -150,9 +164,11 @@ function getTranscribeSettings() {
 
 function startTranscription() {
   menuClose();
+  disableModeControle();
   disableSettingControle();
-  document.querySelector("#start-button").disabled = true;
-  document.querySelector("#stop-button").disabled = false;
+
+  document.querySelector("#start-button").classList.add("hidden");
+  document.querySelector("#stop-button").classList.remove("hidden");
   clearAudioControl();
   clearMessage("transcription");
 
@@ -169,6 +185,80 @@ function startTranscription() {
 
 async function stopTranscription() {
   await eel.stop_transcription();
+}
+
+function audioTranscription() {
+  const fileInput = document.querySelector("#audio-file");
+  const file = fileInput.files[0];
+
+  if (!fileValidation(file)) {
+    return;
+  }
+  document.querySelector("#loading-screen").classList.add("show");
+  menuClose();
+  document.querySelector("#audio-file").disabled = true;
+
+  clearAudioControl();
+  clearMessage("transcription");
+
+  const appSettings = getAppSettings();
+  const modelSettings = getModelSettings();
+  const transcribeSettings = getTranscribeSettings();
+
+  const reader = new FileReader();
+  reader.onload = function (e) {
+    const data = new Uint8Array(e.target.result);
+    eel.audio_transcription(
+      {
+        app_settings: appSettings,
+        model_settings: modelSettings,
+        transcribe_settings: transcribeSettings,
+      },
+      Array.from(data)
+    );
+  };
+  reader.readAsArrayBuffer(file);
+}
+
+function fileValidation(file) {
+  if (!file) {
+    on_recive_message("No file chosen");
+    return false;
+  }
+
+  const allowedAudioTypes = ["audio/wav"];
+  if (!allowedAudioTypes.includes(file.type)) {
+    on_recive_message("Invalid file type. Please select a WAV audio file");
+    return false;
+  }
+
+  const maxSizeInMB = 10;
+  const maxSizeInBytes = maxSizeInMB * 1024 * 1024;
+  if (file.size > maxSizeInBytes) {
+    on_recive_message(`File size must be under ${maxSizeInMB}MB`);
+    return false;
+  }
+  return true;
+}
+
+function realTimeMode() {
+  document.querySelector("#real-time-mode").classList.add("selected");
+  document.querySelector("#audio-mode").classList.remove("selected");
+
+  document.querySelector("#start-button").classList.remove("hidden");
+
+  document.querySelector("#audio-transcription").classList.add("hidden");
+  document.querySelector("#audio-file").classList.add("hidden");
+}
+
+function audioMode() {
+  document.querySelector("#real-time-mode").classList.remove("selected");
+  document.querySelector("#audio-mode").classList.add("selected");
+
+  document.querySelector("#start-button").classList.add("hidden");
+
+  document.querySelector("#audio-transcription").classList.remove("hidden");
+  document.querySelector("#audio-file").classList.remove("hidden");
 }
 
 function createDropdownOptions(options, elementId) {
@@ -278,12 +368,27 @@ function addButtonClickEventListener() {
     });
   });
 
+  document
+    .querySelector("#real-time-mode")
+    .addEventListener("click", function () {
+      realTimeMode();
+    });
+
+  document.querySelector("#audio-mode").addEventListener("click", function () {
+    audioMode();
+  });
+
   document.querySelector("#start-button").addEventListener("click", () => {
     startTranscription();
   });
   document.querySelector("#stop-button").addEventListener("click", () => {
     stopTranscription();
   });
+  document
+    .querySelector("#audio-transcription")
+    .addEventListener("click", () => {
+      audioTranscription();
+    });
 
   document
     .querySelector("#transcription-copy")
@@ -390,4 +495,14 @@ function enableSettingControle() {
   for (var i = 0; i < elements.length; i++) {
     elements[i].disabled = false;
   }
+}
+
+function disableModeControle() {
+  document.querySelector("#real-time-mode").disabled = true;
+  document.querySelector("#audio-mode").disabled = true;
+}
+
+function enableModeControle() {
+  document.querySelector("#real-time-mode").disabled = false;
+  document.querySelector("#audio-mode").disabled = false;
 }

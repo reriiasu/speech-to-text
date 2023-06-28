@@ -14,6 +14,36 @@ body {
   background-color: #f4f4f4;
 }
 
+#loading-screen {
+  display: none;
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  background: rgba(0, 0, 0, 0.6);
+  -webkit-background-size: cover;
+  -moz-background-size: cover;
+  -o-background-size: cover;
+  background-size: cover;
+  z-index: 1000;
+  align-items: center;
+  justify-content: center;
+}
+
+#loading-screen.show {
+  display: flex;
+}
+
+.spinner {
+  border: 16px solid #f3f3f3;
+  border-top: 16px solid #3498db;
+  border-radius: 50%;
+  width: 120px;
+  height: 120px;
+  animation: spin 2s linear infinite;
+}
+
 .menus {
   display: flex;
   justify-content: flex-end;
@@ -61,18 +91,42 @@ body {
   overflow: hidden;
 }
 
+.mode-button {
+  display: inline-block;
+  margin-top: 8px;
+  margin-right: 0;
+  margin-bottom: 8px;
+  margin-left: 4px;
+  padding: 8px 12px;
+  color: rgba(51, 51, 51, 0.7);
+  font-size: 16px;
+  box-sizing: border-box;
+  cursor: pointer;
+  transition: color 0.3s ease, background-color 0.3s ease;
+  border-radius: 4px;
+  border: none;
+  background: none;
+}
+
+.mode-button:hover {
+  color: #333;
+  background-color: rgba(51, 51, 51, 0.2);
+}
+
+.mode-button.selected {
+  border-bottom: 2px solid #333;
+  background-color: rgba(51, 51, 51, 0.1);
+  color: #333;
+}
+
 .main-content-label {
   display: inline-block;
   margin-left: 2px;
-  padding: 2px 10px;
+  padding: 2px 5px;
   background-color: transparent;
   color: #333;
   font-size: 14px;
   box-sizing: border-box;
-}
-
-.main-content-label#mode {
-  border-bottom: 2px solid #333;
 }
 
 .setting-item {
@@ -149,50 +203,71 @@ input[type="number"].setting-control {
 }
 
 .transcription-button {
-  height: 50px;
+  height: 32px;
+  width: 180px;
   color: white;
-  padding: 10px 24px;
+  padding: 0 16px;
   text-align: center;
   text-decoration: none;
   display: inline-block;
   font-size: 16px;
-  margin: 4px 2px;
+  margin: 4px 4px;
   cursor: pointer;
   transition-duration: 0.4s;
+  border-radius: 4px;
 }
 
-.transcription-button.start-button {
+.transcription-button.start {
   background-color: #4caf50;
   border: 2px solid #4caf50;
 }
 
-.transcription-button.start-button:hover {
+.transcription-button.start:hover {
   background-color: white;
   color: #4caf50;
 }
 
-.transcription-button.stop-button {
+.transcription-button.stop {
   background-color: #f44336;
   border: 2px solid #f44336;
 }
 
-.transcription-button.stop-button:hover {
+.transcription-button.stop:hover {
   background-color: white;
   color: #f44336;
 }
 
-.transcription-button:disabled {
-  background-color: #ccc;
-  color: #888;
-  cursor: not-allowed;
-  border: 2px solid #ccc;
+.transcription-button.audio {
+  background-color: #50a8d1;
+  border: 2px solid #50a8d1;
 }
 
-.transcription-button:disabled:hover {
-  background-color: #ccc;
-  color: #888;
-  cursor: not-allowed;
-  border: 2px solid #ccc;
+.transcription-button.audio:hover {
+  background-color: white;
+  color: #50a8d1;
+}
+
+.transcription-button.hidden {
+  display: none;
+}
+
+#audio-file {
+  height: 32px;
+  line-height: 32px;
+  font-size: 12px;
+  margin: 4px 2px;
+}
+
+#audio-file.hidden {
+  display: none;
+}
+
+#audio-control {
+  position: absolute;
+  top: 0px;
+  left: 185px;
+  margin: 4px 4px;
+  height: 16px;
 }
 
 .recive-message-area {
@@ -210,7 +285,7 @@ input[type="number"].setting-control {
 
 .message-area {
   padding: 5px;
-  margin: 10px;
+  margin: 10px 5px;
   background: #f8f8f8;
   border-radius: 10px;
   border: 1px solid #ddd;
@@ -321,5 +396,14 @@ input[type="number"].setting-control {
   }
   100% {
     opacity: 0;
+  }
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
   }
 }

@@ -16,12 +16,6 @@ If the sentences are well separated, the transcription takes less than a second.
 Large-v2 model</br>
 Executed with CUDA 11.7 on a NVIDIA GeForce RTX 3060 12GB.
 
-## New
-
-1. Implemented feature to generate audio files from input sound.
-1. Implemented feature to synchronize audio files with transcription.
-Audio and text highlighting are linked.
-
 ## Installation
 
 1. pip install .
@@ -42,6 +36,18 @@ Audio and text highlighting are linked.
 ## Demo
 
 ![demo](docs/demo.gif)
+
+## News
+
+### 2023-06-26
+
+1. Implemented feature to generate audio files from input sound.
+1. Implemented feature to synchronize audio files with transcription.
+Audio and text highlighting are linked.
+
+### 2023-06-29
+
+1. Implemented feature to transcription from audio files.
 
 ## Todo
 

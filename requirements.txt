@@ -1,3 +1,4 @@
 faster-whisper == 0.6.0
 sounddevice == 0.4.6
 eel == 0.15.3
+soundfile == 0.12.1

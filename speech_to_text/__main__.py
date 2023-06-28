@@ -6,8 +6,8 @@ import threading
 from faster_whisper import WhisperModel
 from .audio_transcriber import AppOptions
 from .audio_transcriber import AudioTranscriber
-from .utils.audio_utils import get_valid_input_devices
-from .utils.file_utils import read_json, write_json
+from .utils.audio_utils import get_valid_input_devices, base64_to_audio
+from .utils.file_utils import read_json, write_json, write_audio
 
 eel.init("web")
 
@@ -43,27 +43,27 @@ def get_dropdown_options():
 @eel.expose
 def get_user_settings():
     data_types = ["app_settings", "model_settings", "transcribe_settings"]
-    userSettings = {}
+    user_settings = {}
 
     try:
         data = read_json("settings", "user_settings")
         for data_type in data_types:
-            userSettings[data_type] = data[data_type]
+            user_settings[data_type] = data[data_type]
     except Exception as e:
         eel.on_recive_message(str(e))
 
-    return userSettings
+    return user_settings
 
 
 @eel.expose
-def start_transcription(userSettings):
+def start_transcription(user_settings):
     global transcriber, event_loop, thread
     try:
         (
             filtered_app_settings,
             filtered_model_settings,
             filtered_transcribe_settings,
-        ) = extracting_each_setting(userSettings)
+        ) = extracting_each_setting(user_settings)
 
         whisper_model = WhisperModel(**filtered_model_settings)
         app_settings = AppOptions(**filtered_app_settings)
@@ -102,6 +102,32 @@ def stop_transcription():
     eel.transcription_stoppd()
 
 
+@eel.expose
+def audio_transcription(user_settings, base64data):
+    global transcriber
+    try:
+        (
+            filtered_app_settings,
+            filtered_model_settings,
+            filtered_transcribe_settings,
+        ) = extracting_each_setting(user_settings)
+
+        whisper_model = WhisperModel(**filtered_model_settings)
+        app_settings = AppOptions(**filtered_app_settings)
+
+        transcriber = AudioTranscriber(
+            event_loop, whisper_model, filtered_transcribe_settings, app_settings
+        )
+
+        audio_data = base64_to_audio(base64data)
+        if len(audio_data) > 0:
+            write_audio("web", "voice", audio_data)
+            transcriber.batch_transcribe_audio(audio_data)
+
+    except Exception as e:
+        eel.on_recive_message(str(e))
+
+
 def get_filtered_app_settings(settings):
     valid_keys = AppOptions.__annotations__.keys()
     return {k: v for k, v in settings.items() if k in valid_keys}
@@ -117,13 +143,13 @@ def get_filtered_transcribe_settings(settings):
     return {k: v for k, v in settings.items() if k in valid_keys}
 
 
-def extracting_each_setting(userSettings):
-    filtered_app_settings = get_filtered_app_settings(userSettings["app_settings"])
+def extracting_each_setting(user_settings):
+    filtered_app_settings = get_filtered_app_settings(user_settings["app_settings"])
     filtered_model_settings = get_filtered_model_settings(
-        userSettings["model_settings"]
+        user_settings["model_settings"]
     )
     filtered_transcribe_settings = get_filtered_transcribe_settings(
-        userSettings["transcribe_settings"]
+        user_settings["transcribe_settings"]
     )
 
     write_json(

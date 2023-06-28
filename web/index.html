@@ -9,6 +9,9 @@
 </head>
 
 <body>
+  <div id="loading-screen">
+    <div class="spinner"></div>
+  </div>
   <div class="menus">
     <div class="menu" id="app-settings">App Settings</div>
     <div class="menu" id="model-settings">Model Settings</div>
@@ -18,24 +21,29 @@
   <div class="content" id="main-content">
     <div class="content-inner">
       <div>
-        <label class="main-content-label" id="mode">Real-time transcription</label>
+        <button class="mode-button selected" id="real-time-mode">Real-time transcription</button>
+        <button class="mode-button" id="audio-mode">Audio transcription</button>
       </div>
       <div class="transcription-controls">
-        <button id="start-button" class="transcription-button start-button">
+        <button id="start-button" class="transcription-button start">
           Start Transcription
         </button>
-        <button id="stop-button" class="transcription-button stop-button" disabled>
+        <button id="stop-button" class="transcription-button stop hidden">
           Stop Transcription
         </button>
-        <audio id="audio-control" controls hidden>
-          <source type="audio/wav">
-          Your browser does not support the audio element.
-        </audio>
+        <button id="audio-transcription" class="transcription-button audio hidden">
+          Audio Transcription
+        </button>
+        <input type="file" id="audio-file" accept=".wav" class="hidden" />
       </div>
       <div class="recive-message-area transcription">
         <div>
           <label class="main-content-label">transcription result</label>
         </div>
+        <audio id="audio-control" controls>
+          <source type="audio/wav">
+          Your browser does not support the audio element.
+        </audio>
         <button id="transcription-copy" class="control-button copy-button">
           Copy
         </button>
