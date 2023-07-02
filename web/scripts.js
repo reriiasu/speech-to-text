@@ -163,6 +163,7 @@ function getTranscribeSettings() {
 }
 
 function startTranscription() {
+  document.querySelector("#loading-screen").classList.add("show");
   menuClose();
   disableModeControle();
   disableSettingControle();
@@ -184,6 +185,7 @@ function startTranscription() {
 }
 
 async function stopTranscription() {
+  document.querySelector("#loading-screen").classList.add("show");
   await eel.stop_transcription();
 }
 
