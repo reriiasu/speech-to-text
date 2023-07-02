@@ -8,12 +8,14 @@ from .audio_transcriber import AppOptions
 from .audio_transcriber import AudioTranscriber
 from .utils.audio_utils import get_valid_input_devices, base64_to_audio
 from .utils.file_utils import read_json, write_json, write_audio
+from .websoket_server import WebSocketServer
 
 eel.init("web")
 
 transcriber: AudioTranscriber = None
 event_loop: asyncio.AbstractEventLoop = None
 thread: threading.Thread = None
+websocket_server: WebSocketServer = None
 
 
 @eel.expose
@@ -57,7 +59,7 @@ def get_user_settings():
 
 @eel.expose
 def start_transcription(user_settings):
-    global transcriber, event_loop, thread
+    global transcriber, event_loop, thread, websocket_server
     try:
         (
             filtered_app_settings,
@@ -69,8 +71,18 @@ def start_transcription(user_settings):
         app_settings = AppOptions(**filtered_app_settings)
         event_loop = asyncio.new_event_loop()
 
+        if app_settings.use_websocket_server:
+            websocket_server = WebSocketServer(event_loop)
+            asyncio.run_coroutine_threadsafe(
+                websocket_server.start_server(), event_loop
+            )
+
         transcriber = AudioTranscriber(
-            event_loop, whisper_model, filtered_transcribe_settings, app_settings
+            event_loop,
+            whisper_model,
+            filtered_transcribe_settings,
+            app_settings,
+            websocket_server,
         )
         asyncio.set_event_loop(event_loop)
         thread = threading.Thread(target=event_loop.run_forever, daemon=True)
@@ -83,21 +95,29 @@ def start_transcription(user_settings):
 
 @eel.expose
 def stop_transcription():
-    global transcriber, event_loop, thread
+    global transcriber, event_loop, thread, websocket_server
     if transcriber is None:
         eel.transcription_stoppd()
         return
-    future = asyncio.run_coroutine_threadsafe(
+    transcriber_future = asyncio.run_coroutine_threadsafe(
         transcriber.stop_transcription(), event_loop
     )
-    future.result()
+    transcriber_future.result()
+
+    if websocket_server is not None:
+        websocket_server_future = asyncio.run_coroutine_threadsafe(
+            websocket_server.stop_server(), event_loop
+        )
+        websocket_server_future.result()
 
     if thread.is_alive():
         event_loop.call_soon_threadsafe(event_loop.stop)
         thread.join()
+    event_loop.close()
     transcriber = None
     event_loop = None
     thread = None
+    websocket_server = None
 
     eel.transcription_stoppd()
 

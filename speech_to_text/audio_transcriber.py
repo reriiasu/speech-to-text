@@ -10,6 +10,7 @@ from concurrent.futures import ThreadPoolExecutor
 from .utils.audio_utils import create_audio_stream
 from .vad import Vad
 from .utils.file_utils import write_audio
+from .websoket_server import WebSocketServer
 
 
 class AppOptions(NamedTuple):
@@ -17,6 +18,7 @@ class AppOptions(NamedTuple):
     silence_limit: int = 8
     noise_threshold: int = 5
     create_audio_file: bool = True
+    use_websocket_server: bool = False
 
 
 class AudioTranscriber:
@@ -26,11 +28,13 @@ class AudioTranscriber:
         whisper_model: WhisperModel,
         transcribe_settings: dict,
         app_options: AppOptions,
+        websocket_server: WebSocketServer,
     ):
         self.event_loop = event_loop
         self.whisper_model: WhisperModel = whisper_model
         self.transcribe_settings = transcribe_settings
         self.app_options = app_options
+        self.websocket_server = websocket_server
         self.vad = Vad()
         self.silence_counter: int = 0
         self.audio_data_list = []
@@ -62,6 +66,8 @@ class AudioTranscriber:
 
                     for segment in segments:
                         eel.display_transcription(segment.text)
+                        if self.websocket_server is not None:
+                            await self.websocket_server.send_message(segment.text)
 
                 except queue.Empty:
                     # Skip to the next iteration if a timeout occurs

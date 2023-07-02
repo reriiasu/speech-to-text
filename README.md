@@ -41,13 +41,18 @@ Executed with CUDA 11.7 on a NVIDIA GeForce RTX 3060 12GB.
 
 ### 2023-06-26
 
-1. Implemented feature to generate audio files from input sound.
-1. Implemented feature to synchronize audio files with transcription.
+1. Add generate audio files from input sound.
+1. Add synchronize audio files with transcription.
 Audio and text highlighting are linked.
 
 ### 2023-06-29
 
-1. Implemented feature to transcription from audio files.
+1. Add transcription from audio files.(only wav format)
+
+### 2023-07-03
+
+1. Add Send transcription results from a WebSocket server to a WebSocket client.
+Example of use: Display subtitles in live streaming.
 
 ## Todo
 
