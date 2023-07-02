@@ -8,7 +8,7 @@ from typing import NamedTuple
 from faster_whisper import WhisperModel
 from concurrent.futures import ThreadPoolExecutor
 from .utils.audio_utils import create_audio_stream
-from .utils.vad_utils import VadUtils
+from .vad import Vad
 from .utils.file_utils import write_audio
 
 
@@ -31,7 +31,7 @@ class AudioTranscriber:
         self.whisper_model: WhisperModel = whisper_model
         self.transcribe_settings = transcribe_settings
         self.app_options = app_options
-        self.vad_wrapper = VadUtils()
+        self.vad = Vad()
         self.silence_counter: int = 0
         self.audio_data_list = []
         self.all_audio_data_list = []
@@ -70,7 +70,7 @@ class AudioTranscriber:
                     eel.on_recive_message(str(e))
 
     def process_audio(self, audio_data: np.ndarray, frames: int, time, status):
-        is_speech = self.vad_wrapper.is_speech(audio_data)
+        is_speech = self.vad.is_speech(audio_data)
         if is_speech:
             self.silence_counter = 0
             self.audio_data_list.append(audio_data.flatten())
