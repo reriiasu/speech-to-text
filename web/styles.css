@@ -251,6 +251,14 @@ input[type="number"].setting-control {
   display: none;
 }
 
+#create-srt {
+  left: 185px;
+}
+
+#create-srt.hidden {
+  display: none;
+}
+
 #audio-file {
   height: 32px;
   line-height: 32px;
@@ -265,7 +273,7 @@ input[type="number"].setting-control {
 #audio-control {
   position: absolute;
   top: 0px;
-  left: 185px;
+  left: 285px;
   margin: 4px 4px;
   height: 16px;
 }
@@ -297,14 +305,20 @@ input[type="number"].setting-control {
   scrollbar-color: #888 #f1f1f1;
 }
 
-.message-area > div {
+.segment-container {
+  width: 100%;
   word-wrap: break-word;
   white-space: normal;
+  box-sizing: border-box;
 }
 
-.message-area > div::after {
+.segment-container::after {
   content: "\a";
   white-space: pre;
+}
+
+.time-label {
+  padding-right: 5px;
 }
 
 #transcription.message-area {

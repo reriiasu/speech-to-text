@@ -109,7 +109,7 @@ class AudioTranscriber:
                 {
                     "start": segment.start,
                     "end": segment.end,
-                    "text": f"[{segment.start:.2f}s -> {segment.end:.2f}s] {segment.text}",
+                    "text": segment.text,
                 }
             )
         eel.on_recive_segments(segment_list)

@@ -22,16 +22,32 @@ function on_recive_segments(segments) {
     audio.load();
   }
 
+  const srt = document.querySelector("#create-srt");
+  srt.classList.remove("hidden");
+
   const transcription = document.querySelector(`#transcription`);
   for (let i = 0; i < segments.length; i++) {
-    const newel = document.createElement("div");
-    newel.textContent = segments[i]["text"];
-    newel.setAttribute("data-start", segments[i]["start"]);
-    newel.setAttribute("data-end", segments[i]["end"]);
+    const text = segments[i]["text"];
+    const start = segments[i]["start"];
+    const end = segments[i]["end"];
 
-    newel.addEventListener("click", onClickTranscription);
+    const block = document.createElement("div");
+    block.classList.add("segment-container");
+    block.setAttribute("data-start", start);
+    block.setAttribute("data-end", end);
+    block.addEventListener("click", onClickSegment);
 
-    transcription.appendChild(newel);
+    const label = document.createElement("label");
+    label.classList.add("time-label");
+    label.textContent = `[${formatTime(start)} --> ${formatTime(end)}]`;
+    block.appendChild(label);
+
+    const span = document.createElement("span");
+    span.classList.add("segment");
+    span.textContent = text;
+    block.appendChild(span);
+
+    transcription.appendChild(block);
   }
 }
 
@@ -53,15 +69,16 @@ function transcription_stoppd2() {
 function addMessage(elementId, message) {
   const el = document.querySelector(`#${elementId}`);
   const newel = document.createElement("div");
+  newel.classList.add("segment-container");
   newel.textContent = message;
   el.appendChild(newel);
 
   el.scrollTop = el.scrollHeight;
 }
 
-function onClickTranscription(event) {
+function onClickSegment(event) {
   const audio = document.querySelector("#audio-control");
-  audio.currentTime = event.target.getAttribute("data-start");
+  audio.currentTime = event.target.parentElement.getAttribute("data-start");
   audio.play();
 }
 
@@ -170,7 +187,8 @@ function startTranscription() {
 
   document.querySelector("#start-button").classList.add("hidden");
   document.querySelector("#stop-button").classList.remove("hidden");
-  clearAudioControl();
+  hideCreateSrt();
+  hideAudioControl();
   clearMessage("transcription");
 
   const appSettings = getAppSettings();
@@ -200,7 +218,8 @@ function audioTranscription() {
   menuClose();
   document.querySelector("#audio-file").disabled = true;
 
-  clearAudioControl();
+  hideCreateSrt();
+  hideAudioControl();
   clearMessage("transcription");
 
   const appSettings = getAppSettings();
@@ -392,6 +411,10 @@ function addButtonClickEventListener() {
       audioTranscription();
     });
 
+  document.querySelector("#create-srt").addEventListener("click", () => {
+    createSrt();
+  });
+
   document
     .querySelector("#transcription-copy")
     .addEventListener("click", () => {
@@ -400,7 +423,8 @@ function addButtonClickEventListener() {
   document
     .querySelector("#transcription-clear")
     .addEventListener("click", () => {
-      clearAudioControl();
+      hideCreateSrt();
+      hideAudioControl();
       clearMessage("transcription");
     });
 
@@ -459,6 +483,59 @@ function copyToClipboard(elementId) {
   );
 }
 
+function downloadSRTFile(content, filename) {
+  const blob = new Blob([content], { type: "text/srt" });
+  const url = URL.createObjectURL(blob);
+
+  const link = document.createElement("a");
+  link.download = filename;
+  link.href = url;
+
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+}
+
+function getSegmentsFromHTML() {
+  const segmentContainers = document.querySelectorAll(".segment-container");
+  const segments = [];
+
+  segmentContainers.forEach((container) => {
+    const labelElement = container.querySelector("label");
+    const spanElement = container.querySelector("span");
+    if (labelElement && spanElement) {
+      segments.push({
+        startEnd: labelElement.textContent
+          .trim()
+          .replace("[", "")
+          .replace("]", ""),
+        text: spanElement.textContent,
+      });
+    }
+  });
+
+  return segments;
+}
+
+function createSrt() {
+  const segments = getSegmentsFromHTML();
+  const srtContent = createSRTContent(segments);
+  downloadSRTFile(srtContent, "subtitles.srt");
+}
+
+function copyToClipboard(elementId) {
+  const transcriptionElement = document.querySelector(`#${elementId}`);
+  const text = transcriptionElement.innerText;
+  navigator.clipboard.writeText(text).then(
+    function () {
+      showToast();
+    },
+    function (err) {
+      console.error("Could not copy text: ", err);
+    }
+  );
+}
+
 function showToast() {
   const toastElement = document.querySelector("#toast");
   toastElement.classList.add("show");
@@ -476,7 +553,12 @@ function clearMessage(elementId) {
   }
 }
 
-function clearAudioControl() {
+function hideCreateSrt() {
+  const srt = document.querySelector("#create-srt");
+  srt.classList.add("hidden");
+}
+
+function hideAudioControl() {
   const audio = document.querySelector("#audio-control");
   audio.pause();
   audio.src = "";
@@ -507,4 +589,32 @@ function disableModeControle() {
 function enableModeControle() {
   document.querySelector("#real-time-mode").disabled = false;
   document.querySelector("#audio-mode").disabled = false;
+}
+
+function formatTime(timeInSeconds) {
+  const hours = Math.floor(timeInSeconds / 3600);
+  const minutes = Math.floor(timeInSeconds / 60) % 60;
+  const seconds = Math.floor(timeInSeconds - hours * 3600 - minutes * 60);
+  const milliseconds = Math.round((timeInSeconds % 1) * 1000);
+
+  return `${pad(hours, 2)}:${pad(minutes, 2)}:${pad(seconds, 2)},${pad(
+    milliseconds,
+    3
+  )}`;
+}
+
+function pad(num, size) {
+  let s = num + "";
+  while (s.length < size) {
+    s = "0" + s;
+  }
+  return s;
+}
+
+function createSRTContent(segments) {
+  return segments
+    .map((segment, index) => {
+      return `${index + 1}\n${segment.startEnd}\n${segment.text}\n`;
+    })
+    .join("\n");
 }
