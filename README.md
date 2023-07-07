@@ -13,7 +13,7 @@ The HTML-based GUI allows you to check the transcription results and make detail
 If the sentences are well separated, the transcription takes less than a second.
 ![TranscriptionSpeed](docs/transcription_speed.png)
 
-Large-v2 model</br>
+Large-v2 model  
 Executed with CUDA 11.7 on a NVIDIA GeForce RTX 3060 12GB.
 
 ## Installation
@@ -42,7 +42,7 @@ Executed with CUDA 11.7 on a NVIDIA GeForce RTX 3060 12GB.
 ### 2023-06-26
 
 - Add generate audio files from input sound.
-- Add synchronize audio files with transcription.
+- Add synchronize audio files with transcription.  
 Audio and text highlighting are linked.
 
 ### 2023-06-29
@@ -51,7 +51,7 @@ Audio and text highlighting are linked.
 
 ### 2023-07-03
 
-- Add Send transcription results from a WebSocket server to a WebSocket client.
+- Add Send transcription results from a WebSocket server to a WebSocket client.  
 Example of use: Display subtitles in live streaming.
 
 ### 2023-07-05
