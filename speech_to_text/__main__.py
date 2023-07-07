@@ -136,7 +136,7 @@ def audio_transcription(user_settings, base64data):
         app_settings = AppOptions(**filtered_app_settings)
 
         transcriber = AudioTranscriber(
-            event_loop, whisper_model, filtered_transcribe_settings, app_settings
+            event_loop, whisper_model, filtered_transcribe_settings, app_settings, None
         )
 
         audio_data = base64_to_audio(base64data)
