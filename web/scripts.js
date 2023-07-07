@@ -216,7 +216,6 @@ function audioTranscription() {
   }
   document.querySelector("#loading-screen").classList.add("show");
   menuClose();
-  document.querySelector("#audio-file").disabled = true;
 
   hideCreateSrt();
   hideAudioControl();
