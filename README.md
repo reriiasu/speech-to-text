@@ -62,6 +62,8 @@ Example of use: Display subtitles in live streaming.
 
 - Add support for mp3, ogg, and other audio files.  
 Depends on Soundfile support.
+- Add setting to include non-speech data in buffer.  
+While this will increase memory usage, it will improve transcription accuracy.
 
 ## Todo
 

@@ -101,6 +101,12 @@
             <input id="noise_threshold" class="setting-control" type="number" min="0" value="5" />
           </div>
           <div class="setting-item">
+            <label for="include_non_speech" class="setting-label"
+              title="That controls whether non-speech data is included in the buffer. When set to true, both speech and non-speech data are stored in the buffer. When set to false, only speech data is stored in the buffer, excluding any non-speech data.">*Include
+              non speech:</label>
+            <input type="checkbox" id="include_non_speech" class="setting-control" />
+          </div>
+          <div class="setting-item">
             <label for="create_audio_file" class="setting-label"
               title="Create an audio file after stopping the transcription, and coordinate it with the transcription.">*Create
               Audio File:</label>
