@@ -58,6 +58,11 @@ Example of use: Display subtitles in live streaming.
 
 - Add generate SRT files from transcription result.
 
+### 2023-07-08
+
+- Add support for mp3, ogg, and other audio files.  
+Depends on Soundfile support.
+
 ## Todo
 
 - [x] Save and load previous settings.

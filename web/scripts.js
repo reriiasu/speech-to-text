@@ -246,12 +246,6 @@ function fileValidation(file) {
     return false;
   }
 
-  const allowedAudioTypes = ["audio/wav"];
-  if (!allowedAudioTypes.includes(file.type)) {
-    on_recive_message("Invalid file type. Please select a WAV audio file");
-    return false;
-  }
-
   const maxSizeInMB = 10;
   const maxSizeInBytes = maxSizeInMB * 1024 * 1024;
   if (file.size > maxSizeInBytes) {

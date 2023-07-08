@@ -3,3 +3,4 @@ sounddevice == 0.4.6
 eel == 0.15.3
 soundfile == 0.12.1
 websockets == 11.0.3
+librosa == 0.10.0.post2
