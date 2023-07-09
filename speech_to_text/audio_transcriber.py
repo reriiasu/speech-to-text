@@ -17,6 +17,7 @@ class AppOptions(NamedTuple):
     audio_device: int
     silence_limit: int = 8
     noise_threshold: int = 5
+    non_speech_threshold: float = 0.1
     include_non_speech: bool = False
     create_audio_file: bool = True
     use_websocket_server: bool = False
@@ -36,7 +37,7 @@ class AudioTranscriber:
         self.transcribe_settings = transcribe_settings
         self.app_options = app_options
         self.websocket_server = websocket_server
-        self.vad = Vad()
+        self.vad = Vad(app_options.non_speech_threshold)
         self.silence_counter: int = 0
         self.audio_data_list = []
         self.all_audio_data_list = []

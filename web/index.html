@@ -101,6 +101,14 @@
             <input id="noise_threshold" class="setting-control" type="number" min="0" value="5" />
           </div>
           <div class="setting-item">
+            <label for="non_speech_threshold" class="setting-label" title="The Non_speech_threshold is a parameter used in
+              Voice Activity Detection (VAD) systems. It sets a limit that distinguishes non-speech sounds from speech,
+              enabling the system to filter out unnecessary noise and focus on relevant vocal data.">*Non speech
+              threshold:</label>
+            <input id="non_speech_threshold" class="setting-control" type="number" min="0.1" max="1.0" value="0.1"
+              step="0.1" />
+          </div>
+          <div class="setting-item">
             <label for="include_non_speech" class="setting-label"
               title="That controls whether non-speech data is included in the buffer. When set to true, both speech and non-speech data are stored in the buffer. When set to false, only speech data is stored in the buffer, excluding any non-speech data.">*Include
               non speech:</label>

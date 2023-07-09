@@ -65,6 +65,10 @@ Depends on Soundfile support.
 - Add setting to include non-speech data in buffer.  
 While this will increase memory usage, it will improve transcription accuracy.
 
+### 2023-07-09
+
+- Add non-speech threshold setting.
+
 ## Todo
 
 - [x] Save and load previous settings.
