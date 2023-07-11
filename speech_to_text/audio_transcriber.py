@@ -7,10 +7,12 @@ import numpy as np
 from typing import NamedTuple
 from faster_whisper import WhisperModel
 from concurrent.futures import ThreadPoolExecutor
+
 from .utils.audio_utils import create_audio_stream
 from .vad import Vad
 from .utils.file_utils import write_audio
 from .websoket_server import WebSocketServer
+from .openai_api import OpenAIAPI
 
 
 class AppOptions(NamedTuple):
@@ -21,6 +23,7 @@ class AppOptions(NamedTuple):
     include_non_speech: bool = False
     create_audio_file: bool = True
     use_websocket_server: bool = False
+    use_openai_api: bool = False
 
 
 class AudioTranscriber:
@@ -31,12 +34,14 @@ class AudioTranscriber:
         transcribe_settings: dict,
         app_options: AppOptions,
         websocket_server: WebSocketServer,
+        openai_api: OpenAIAPI,
     ):
         self.event_loop = event_loop
         self.whisper_model: WhisperModel = whisper_model
         self.transcribe_settings = transcribe_settings
         self.app_options = app_options
         self.websocket_server = websocket_server
+        self.openai_api = openai_api
         self.vad = Vad(app_options.non_speech_threshold)
         self.silence_counter: int = 0
         self.audio_data_list = []
@@ -116,7 +121,33 @@ class AudioTranscriber:
                     "text": segment.text,
                 }
             )
+
+        eel.transcription_clear()
+
+        if self.openai_api is not None:
+            self.text_proofreading(segment_list)
+        else:
+            eel.on_recive_segments(segment_list)
+
+    def text_proofreading(self, segment_list: list):
+        # Use [#] as a separator
+        combined_text = "[#]" + "[#]".join(segment["text"] for segment in segment_list)
+        result = self.openai_api.text_proofreading(combined_text)
+        split_text = result.split("[#]")
+
+        del split_text[0]
+
+        eel.display_transcription("Before text proofreading.")
         eel.on_recive_segments(segment_list)
+
+        if len(split_text) == len(segment_list):
+            for i, segment in enumerate(segment_list):
+                segment["text"] = split_text[i]
+            eel.on_recive_message("proofread success.")
+            eel.display_transcription("After text proofreading.")
+            eel.on_recive_segments(segment_list)
+        else:
+            eel.on_recive_message("proofread failure.")
 
     async def start_transcription(self):
         try:

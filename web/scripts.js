@@ -9,10 +9,15 @@ function display_transcription(transcript) {
   addMessage("transcription", transcript);
 }
 
+eel.expose(transcription_clear);
+function transcription_clear() {
+  clearMessage("transcription");
+}
+
 eel.expose(on_recive_segments);
 function on_recive_segments(segments) {
   document.querySelector("#loading-screen").classList.remove("show");
-  clearMessage("transcription");
+
   const audio = document.querySelector("#audio-control");
 
   const appSettings = getAppSettings();

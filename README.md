@@ -29,6 +29,8 @@ Executed with CUDA 11.7 on a NVIDIA GeForce RTX 3060 12GB.
 1. Select "VAD Settings" and configure the settings.
 1. Start Transcription
 
+If you use the OpenAI API for text proofreading, set OPENAI_API_KEY as an environment variable.
+
 ## Notes
 
 - If you select local_model in "Model size or path", the model with the same name in the local folder will be referenced.
@@ -68,6 +70,11 @@ While this will increase memory usage, it will improve transcription accuracy.
 ### 2023-07-09
 
 - Add non-speech threshold setting.
+
+### 2023-07-11
+
+- Add Text proofreading option via OpenAI API.  
+Transcription results can be proofread.
 
 ## Todo
 

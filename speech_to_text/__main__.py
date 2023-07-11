@@ -9,6 +9,7 @@ from .audio_transcriber import AudioTranscriber
 from .utils.audio_utils import get_valid_input_devices, base64_to_audio
 from .utils.file_utils import read_json, write_json, write_audio
 from .websoket_server import WebSocketServer
+from .openai_api import OpenAIAPI
 
 eel.init("web")
 
@@ -16,6 +17,7 @@ transcriber: AudioTranscriber = None
 event_loop: asyncio.AbstractEventLoop = None
 thread: threading.Thread = None
 websocket_server: WebSocketServer = None
+openai_api: OpenAIAPI = None
 
 
 @eel.expose
@@ -59,7 +61,7 @@ def get_user_settings():
 
 @eel.expose
 def start_transcription(user_settings):
-    global transcriber, event_loop, thread, websocket_server
+    global transcriber, event_loop, thread, websocket_server, openai_api
     try:
         (
             filtered_app_settings,
@@ -77,12 +79,16 @@ def start_transcription(user_settings):
                 websocket_server.start_server(), event_loop
             )
 
+        if app_settings.use_openai_api:
+            openai_api = OpenAIAPI()
+
         transcriber = AudioTranscriber(
             event_loop,
             whisper_model,
             filtered_transcribe_settings,
             app_settings,
             websocket_server,
+            openai_api,
         )
         asyncio.set_event_loop(event_loop)
         thread = threading.Thread(target=event_loop.run_forever, daemon=True)
@@ -95,7 +101,7 @@ def start_transcription(user_settings):
 
 @eel.expose
 def stop_transcription():
-    global transcriber, event_loop, thread, websocket_server
+    global transcriber, event_loop, thread, websocket_server, openai_api
     if transcriber is None:
         eel.transcription_stoppd()
         return
@@ -118,13 +124,14 @@ def stop_transcription():
     event_loop = None
     thread = None
     websocket_server = None
+    openai_api = None
 
     eel.transcription_stoppd()
 
 
 @eel.expose
 def audio_transcription(user_settings, base64data):
-    global transcriber
+    global transcriber, openai_api
     try:
         (
             filtered_app_settings,
@@ -135,8 +142,16 @@ def audio_transcription(user_settings, base64data):
         whisper_model = WhisperModel(**filtered_model_settings)
         app_settings = AppOptions(**filtered_app_settings)
 
+        if app_settings.use_openai_api:
+            openai_api = OpenAIAPI()
+
         transcriber = AudioTranscriber(
-            event_loop, whisper_model, filtered_transcribe_settings, app_settings, None
+            event_loop,
+            whisper_model,
+            filtered_transcribe_settings,
+            app_settings,
+            None,
+            openai_api,
         )
 
         audio_data = base64_to_audio(base64data)
@@ -146,6 +161,8 @@ def audio_transcription(user_settings, base64data):
 
     except Exception as e:
         eel.on_recive_message(str(e))
+
+    openai_api = None
 
 
 def get_filtered_app_settings(settings):
