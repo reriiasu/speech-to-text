@@ -8,7 +8,7 @@ class OpenAIAPI:
         self.MODEL_NAME = "gpt-3.5-turbo"
         self.MAX_TOKENS = 2000
 
-    def text_proofreading(self, prompt: str):
+    def text_proofreading(self, text: str):
         response = openai.ChatCompletion.create(
             model=self.MODEL_NAME,
             max_tokens=self.MAX_TOKENS,
@@ -17,7 +17,7 @@ class OpenAIAPI:
                     "role": "system",
                     "content": "Please proofread. Please return only the proofreading results.",
                 },
-                {"role": "user", "content": prompt},
+                {"role": "user", "content": text},
             ],
         )
         return response.choices[0]["message"]["content"].strip()
