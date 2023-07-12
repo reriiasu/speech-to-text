@@ -164,6 +164,7 @@ class AudioTranscriber:
             eel.on_recive_segments(segment_list)
         else:
             eel.on_recive_message("proofread failure.")
+            eel.on_recive_message(result)
 
     async def start_transcription(self):
         try:
