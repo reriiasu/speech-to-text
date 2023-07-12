@@ -53,6 +53,11 @@ class AudioTranscriber:
         self._transcribe_task = None
 
     async def transcribe_audio(self):
+        # Ignore parameters that affect performance
+        transcribe_settings = self.transcribe_settings.copy()
+        transcribe_settings["without_timestamps"] = True
+        transcribe_settings["word_timestamps"] = False
+
         with ThreadPoolExecutor() as executor:
             while self.transcribing:
                 try:
@@ -65,7 +70,7 @@ class AudioTranscriber:
                     func = functools.partial(
                         self.whisper_model.transcribe,
                         audio=audio_data,
-                        **self.transcribe_settings,
+                        **transcribe_settings,
                     )
 
                     # Run the transcribe method in a thread
@@ -108,17 +113,27 @@ class AudioTranscriber:
 
     def batch_transcribe_audio(self, audio_data: np.ndarray):
         segment_list = []
-
         segments, _ = self.whisper_model.transcribe(
             audio=audio_data, **self.transcribe_settings
         )
 
         for segment in segments:
+            word_list = []
+            if self.transcribe_settings["word_timestamps"] == True:
+                for word in segment.words:
+                    word_list.append(
+                        {
+                            "start": word.start,
+                            "end": word.end,
+                            "text": word.word,
+                        }
+                    )
             segment_list.append(
                 {
                     "start": segment.start,
                     "end": segment.end,
                     "text": segment.text,
+                    "words": word_list,
                 }
             )
 
@@ -143,6 +158,7 @@ class AudioTranscriber:
         if len(split_text) == len(segment_list):
             for i, segment in enumerate(segment_list):
                 segment["text"] = split_text[i]
+                segment["words"] = []
             eel.on_recive_message("proofread success.")
             eel.display_transcription("After text proofreading.")
             eel.on_recive_segments(segment_list)

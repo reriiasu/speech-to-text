@@ -32,25 +32,41 @@ function on_recive_segments(segments) {
 
   const transcription = document.querySelector(`#transcription`);
   for (let i = 0; i < segments.length; i++) {
-    const text = segments[i]["text"];
+    const words = segments[i]["words"];
     const start = segments[i]["start"];
     const end = segments[i]["end"];
 
     const block = document.createElement("div");
     block.classList.add("segment-container");
-    block.setAttribute("data-start", start);
-    block.setAttribute("data-end", end);
-    block.addEventListener("click", onClickSegment);
 
     const label = document.createElement("label");
     label.classList.add("time-label");
     label.textContent = `[${formatTime(start)} --> ${formatTime(end)}]`;
     block.appendChild(label);
 
-    const span = document.createElement("span");
-    span.classList.add("segment");
-    span.textContent = text;
-    block.appendChild(span);
+    if (words.length !== 0) {
+      for (let j = 0; j < words.length; j++) {
+        const text = words[j]["text"];
+        const wordStart = words[j]["start"];
+        const wordEnd = words[j]["end"];
+
+        const span = document.createElement("span");
+        span.textContent = text;
+        span.setAttribute("data-start", wordStart);
+        span.setAttribute("data-end", wordEnd);
+        span.addEventListener("click", onClickSegment);
+        block.appendChild(span);
+      }
+    } else {
+      const text = segments[i]["text"];
+
+      const span = document.createElement("span");
+      span.textContent = text;
+      span.setAttribute("data-start", start);
+      span.setAttribute("data-end", end);
+      span.addEventListener("click", onClickSegment);
+      block.appendChild(span);
+    }
 
     transcription.appendChild(block);
   }
@@ -83,7 +99,7 @@ function addMessage(elementId, message) {
 
 function onClickSegment(event) {
   const audio = document.querySelector("#audio-control");
-  audio.currentTime = event.target.parentElement.getAttribute("data-start");
+  audio.currentTime = event.target.getAttribute("data-start");
   audio.play();
 }
 
@@ -440,18 +456,19 @@ function addButtonClickEventListener() {
 
 function addTimeupdateEventListener() {
   const audio = document.querySelector(`#audio-control`);
+  // Define the time extension to avoid skipping subtitle highlighting
+  const timeExtension = 0.2;
 
   audio.addEventListener("timeupdate", (event) => {
     const currentTime = event.target.currentTime;
-    const subtitles = Array.from(
-      document.querySelector("#transcription").children
-    );
+    const subtitles = document.querySelectorAll("#transcription span");
 
     subtitles.forEach((subtitle) => {
       const start = parseFloat(subtitle.getAttribute("data-start"));
       const end = parseFloat(subtitle.getAttribute("data-end"));
 
-      if (currentTime >= start && currentTime <= end) {
+      // Add the time extension to the end time
+      if (currentTime >= start && currentTime <= end + timeExtension) {
         subtitle.classList.add("highlight");
       } else {
         subtitle.classList.remove("highlight");

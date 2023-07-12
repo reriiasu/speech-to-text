@@ -76,6 +76,11 @@ While this will increase memory usage, it will improve transcription accuracy.
 - Add Text proofreading option via OpenAI API.  
 Transcription results can be proofread.
 
+### 2023-07-12
+
+- Add feature where audio and word highlighting are synchronized.  
+if Word Timestamps is true.
+
 ## Todo
 
 - [x] Save and load previous settings.
