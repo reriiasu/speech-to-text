@@ -512,20 +512,17 @@ function downloadSRTFile(content, filename) {
 }
 
 function getSegmentsFromHTML() {
+  const regex = /\[(\d{2}:\d{2}:\d{2},\d{3} --> \d{2}:\d{2}:\d{2},\d{3})\](.+)/;
   const segmentContainers = document.querySelectorAll(".segment-container");
-  const segments = [];
+  const segments = new Map();
 
   segmentContainers.forEach((container) => {
-    const labelElement = container.querySelector("label");
-    const spanElement = container.querySelector("span");
-    if (labelElement && spanElement) {
-      segments.push({
-        startEnd: labelElement.textContent
-          .trim()
-          .replace("[", "")
-          .replace("]", ""),
-        text: spanElement.textContent,
-      });
+    const match = container.innerText.match(regex);
+
+    if (match) {
+      const timestamp = match[1];
+      const text = match[2].trim();
+      segments.set(timestamp, text);
     }
   });
 
@@ -627,9 +624,9 @@ function pad(num, size) {
 }
 
 function createSRTContent(segments) {
-  return segments
-    .map((segment, index) => {
-      return `${index + 1}\n${segment.startEnd}\n${segment.text}\n`;
+  return Array.from(segments.entries())
+    .map(([key, value], index) => {
+      return `${index + 1}\n${key}\n${value}\n`;
     })
     .join("\n");
 }
