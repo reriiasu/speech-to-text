@@ -89,4 +89,4 @@ if Word Timestamps is true.
 
 - [x] Allow local parameters to be set from the GUI.
 
-- [] Supports additional options in faster-whisper 0.8.0
+- [ ] Supports additional options in faster-whisper 0.8.0
