@@ -88,3 +88,5 @@ if Word Timestamps is true.
 - [x] Use Silero VAD
 
 - [x] Allow local parameters to be set from the GUI.
+
+- [] Supports additional options in faster-whisper 0.8.0
