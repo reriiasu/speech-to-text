@@ -8,7 +8,7 @@ def read_requirements():
 
 setup(
     name="speech-to-text",
-    version="0.3.5",
+    version="0.3.6",
     description="Real-time transcription using faster-whisper",
     author="reriiasu",
     url="https://github.com/reriiasu/speech-to-text",

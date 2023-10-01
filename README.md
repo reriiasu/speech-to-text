@@ -81,6 +81,11 @@ Transcription results can be proofread.
 - Add feature where audio and word highlighting are synchronized.  
 if Word Timestamps is true.
 
+### 2023-10-01
+
+- Support for repetition_penalty and no_repeat_ngram_size in transcribe_settings.
+- Updating packages.
+
 ## Todo
 
 - [x] Save and load previous settings.
@@ -89,4 +94,4 @@ if Word Timestamps is true.
 
 - [x] Allow local parameters to be set from the GUI.
 
-- [ ] Supports additional options in faster-whisper 0.8.0
+- [x] Supports additional options in faster-whisper 0.8.0
