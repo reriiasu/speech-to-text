@@ -264,6 +264,23 @@
             </label>
             <input id="length_penalty" class="setting-control" type="number" min="0" step="0.1" value="1" />
           </div>
+
+          <div class="setting-item">
+            <label for="repetition_penalty" class="setting-label" title="Penalty applied to the score of previously generated tokens
+            (set > 1 to penalize).">
+              *Repetition Penalty
+            </label>
+            <input id="repetition_penalty" class="setting-control" type="number" min="1" step="0.1" value="1" />
+          </div>
+
+          <div class="setting-item">
+            <label for="no_repeat_ngram_size" class="setting-label"
+              title="Prevent repetitions of ngrams with this size (set 0 to disable).">
+              *No Repeat Ngram Size:
+            </label>
+            <input id="no_repeat_ngram_size" class="setting-control" type="number" min="0" value="0" />
+          </div>
+
           <div class="setting-item">
             <label for="temperature" class="setting-label"
               title="Temperature for sampling. It can be a tuple of temperatures, which will be successively used upon failures according to either `compression_ratio_threshold` or `log_prob_threshold`.">
