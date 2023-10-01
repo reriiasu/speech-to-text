@@ -2,7 +2,7 @@ NOTICES
 
 ---------------------------------------------------------
 
-guillaumekln/faster-whisper 0.6.0 - MIT
+guillaumekln/faster-whisper - MIT
 https://github.com/guillaumekln/faster-whisper
 
 MIT License
@@ -29,7 +29,7 @@ SOFTWARE.
 
 ---------------------------------------------------------
 
-python-sounddevice 0.4.6 - MIT
+python-sounddevice - MIT
 https://github.com/spatialaudio/python-sounddevice
 
 Copyright (c) 2015-2023 Matthias Geier
@@ -54,7 +54,7 @@ THE SOFTWARE.
 
 ---------------------------------------------------------
 
-Eel 0.15.3 - MIT
+Eel - MIT
 https://github.com/spatialaudio/python-sounddevice
 
 MIT License
