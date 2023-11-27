@@ -86,6 +86,11 @@ if Word Timestamps is true.
 - Support for repetition_penalty and no_repeat_ngram_size in transcribe_settings.
 - Updating packages.
 
+### 2023-11-27
+
+- Support "large-v3" model
+- Update faster-whisper requirement to include the latest version 0.10.0
+
 ## Todo
 
 - [x] Save and load previous settings.
