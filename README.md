@@ -88,8 +88,8 @@ if Word Timestamps is true.
 
 ### 2023-11-27
 
-- Support "large-v3" model
-- Update faster-whisper requirement to include the latest version 0.10.0
+- Support "large-v3" model.
+- Update faster-whisper requirement to include the latest version "0.10.0".
 
 ## Todo
 
