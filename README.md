@@ -20,6 +20,14 @@ Executed with CUDA 11.7 on a NVIDIA GeForce RTX 3060 12GB.
 
 1. pip install .
 
+### for Windows
+
+Please execute "run.bat." It will perform the following actions:
+
+1. Create a Python virtual environment.
+1. Install pip.
+1. Run speech_to_text.
+
 ## Usage
 
 1. python -m speech_to_text
@@ -90,6 +98,13 @@ if Word Timestamps is true.
 
 - Support "large-v3" model.
 - Update faster-whisper requirement to include the latest version "0.10.0".
+
+### 2024-07-23
+
+- Support "Faster Distil-Whisper" model.
+- Update faster-whisper requirement to include the latest version "1.0.3".
+- Updating packages.
+- Add run.bat for Windows.
 
 ## Todo
 
