@@ -25,7 +25,7 @@ Executed with CUDA 11.7 on a NVIDIA GeForce RTX 3060 12GB.
 Please execute "run.bat." It will perform the following actions:
 
 1. Create a Python virtual environment.
-1. Install pip.
+1. Install pip packages.
 1. Run speech_to_text.
 
 ## Usage
